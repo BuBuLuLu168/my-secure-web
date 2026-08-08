@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบเข้าชมไฟล์ปลอดภัย</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- หน้าเข้าสู่ระบบ -->
+  <div id="login-box">
+    <h2>กรุณาใส่ข้อมูลเพื่อเข้าดูไฟล์</h2>
+    <input type="text" id="username" placeholder="ชื่อผู้ใช้งานของคุณ">
+    <input type="password" id="access-code" placeholder="รหัสผ่านรหัสไฟล์">
+    <button onclick="checkAccess()">เข้าสู่ระบบ</button>
+    <p id="error-msg" style="color: red; display: none;">รหัสไม่ถูกต้อง!</p>
+  </div>
+
+  <!-- หน้าแสดงเนื้อหา (ซ่อนไว้ก่อน) -->
+  <div id="content-box" style="display: none;">
+    <h1>ยินดีต้อนรับ! นี่คือไฟล์ของคุณ</h1>
+    <p>เนื้อหาความลับตรงนี้จะไม่สามารถแคปจอหรือกดพิมพ์ได้...</p>
+  </div>
+
+  <!-- ลายน้ำป้องกันถ่ายรูป -->
+  <div id="watermark"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>
