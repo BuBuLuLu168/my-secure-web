@@ -1,12 +1,21 @@
+// ==========================================
+// My KeySpace - Main Script
+// ==========================================
+
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
 const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
 
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ตั้งค่า PDF.js Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let currentLoggedInUser = "";
+
+// ------------------------------------------
+// 1. ระบบเมนู & แจ้งเตือน
+// ------------------------------------------
 
 // เปิด / ปิด เมนูดรอปดาวน์
 function toggleMenu() {
@@ -14,7 +23,7 @@ function toggleMenu() {
   menu.classList.toggle("show");
 }
 
-// ปิดเมนูเมื่อคลิกข้างนอก
+// ปิดเมนูเมื่อคลิกพื้นที่อื่น
 window.addEventListener("click", (e) => {
   if (!e.target.matches('.menu-btn')) {
     const menu = document.getElementById("dropdown-menu");
@@ -29,7 +38,10 @@ function showRules() {
   alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
 }
 
-// เช็กรหัสผ่านเข้าสู่ระบบ
+// ------------------------------------------
+// 2. ระบบเข้าสู่ระบบ (Case-insensitive)
+// ------------------------------------------
+
 async function checkAccess() {
   const user = document.getElementById("username").value.trim();
   const code = document.getElementById("access-code").value.trim();
@@ -41,10 +53,11 @@ async function checkAccess() {
     return;
   }
 
+  // ใช้ .ilike เพื่อยอมรับทั้งตัวพิมพ์เล็กและตัวพิมพ์ใหญ่
   const { data, error } = await _supabase
     .from('user_access_codes')
     .select('*')
-    .eq('username', user)
+    .ilike('username', user)
     .eq('access_code', code);
 
   if (error || !data || data.length === 0) {
@@ -53,30 +66,34 @@ async function checkAccess() {
     return;
   }
 
-  currentLoggedInUser = user;
+  // บันทึกชื่อผู้ใช้ที่ถูกต้องจากระบบ
+  currentLoggedInUser = data[0].username;
   errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   
   const statusBadge = document.getElementById("status-badge");
   statusBadge.className = "badge-status badge-online";
-  statusBadge.innerText = `👤 ${user}`;
+  statusBadge.innerText = `👤 ${currentLoggedInUser}`;
   document.getElementById("menu-logout").style.display = "block";
-  document.getElementById("user-display-name").innerText = user;
+  document.getElementById("user-display-name").innerText = currentLoggedInUser;
 
   loadFileList();
 }
 
-// ฟังก์ชันดึงเฉพาะไฟล์ที่ผู้ใช้มีสิทธิ์อ่านจาก Supabase
+// ------------------------------------------
+// 3. ดึงรายการไฟล์เฉพาะที่มีสิทธิ์
+// ------------------------------------------
+
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
-  fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C;'>กำลังตรวจสอบสิทธิ์เข้าถึงไฟล์...</p>";
+  fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C; padding:20px;'>⏳ กำลังตรวจสอบสิทธิ์เข้าถึงไฟล์...</p>";
 
-  // 1. ดึงรายการไฟล์ที่ผู้ใช้คนนี้มีสิทธิ์จากตาราง user_permissions
+  // ดึงรายการไฟล์ที่ผู้ใช้มีสิทธิ์จากตาราง user_permissions (ไม่สนตัวพิมพ์เล็กใหญ่)
   const { data: userPerms, error: permError } = await _supabase
     .from('user_permissions')
     .select('file_name')
-    .eq('username', currentLoggedInUser);
+    .ilike('username', currentLoggedInUser);
 
   fileGrid.innerHTML = "";
 
@@ -86,17 +103,17 @@ async function loadFileList() {
     return;
   }
 
-  // แปลงรายชื่อไฟล์ที่ได้รับอนุญาตให้อยู่ในรูป Array
+  // แปลงชื่อไฟล์ที่ได้รับสิทธิ์เป็น Array
   const allowedFileNames = userPerms.map(p => p.file_name);
 
-  // 2. ดึงไฟล์ทั้งหมดจาก Storage
+  // ดึงไฟล์ทั้งหมดจาก Supabase Storage
   const { data: storageFiles, error: storageError } = await _supabase.storage.from('pdf-files').list();
 
   if (storageFiles && storageFiles.length > 0) {
     storageFiles.forEach((file) => {
       if (file.name.startsWith('.')) return;
 
-      // แสดงเฉพาะไฟล์ที่มีชื่อตรงกับสิทธิ์ในตาราง user_permissions เท่านั้น
+      // แสดงเฉพาะไฟล์ที่มีในสิทธิ์ user_permissions
       if (allowedFileNames.includes(file.name)) {
         const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
 
@@ -122,7 +139,7 @@ async function loadFileList() {
   }
 }
 
-// ฟังก์ชันเพิ่มการ์ด Coming Soon ต่อท้าย
+// เพิ่มการ์ด Coming Soon ต่อท้าย
 function appendComingSoonCard(container) {
   const comingSoonCard = document.createElement("div");
   comingSoonCard.className = "file-card coming-soon-card";
@@ -134,7 +151,7 @@ function appendComingSoonCard(container) {
   container.appendChild(comingSoonCard);
 }
 
-// ฟังก์ชันค้นหาไฟล์ Real-time
+// ค้นหาไฟล์ Real-time
 function filterFiles() {
   const searchText = document.getElementById("search-input").value.toLowerCase().trim();
   const cards = document.querySelectorAll(".file-card");
@@ -154,7 +171,10 @@ function filterFiles() {
   });
 }
 
-// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้
+// ------------------------------------------
+// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล
+// ------------------------------------------
+
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
@@ -196,7 +216,7 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // วาดลายน้ำพาดเอียงฝังลง Canvas
+      // วาดลายน้ำชื่อผู้ใช้พาดเอียงฝังลง Canvas
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 32px 'Itim', sans-serif";
@@ -237,7 +257,10 @@ function logout() {
   document.getElementById("pdf-container").innerHTML = "";
 }
 
-// ระบบ Pull-to-Refresh
+// ------------------------------------------
+// 5. ระบบ Pull-to-Refresh มือถือ
+// ------------------------------------------
+
 let touchStartY = 0;
 let touchEndY = 0;
 
@@ -256,7 +279,10 @@ window.addEventListener('touchend', (e) => {
   }
 }, { passive: true });
 
-// ป้องกันการคลิกขวา / แคปภาพ / คัดลอก
+// ------------------------------------------
+// 6. ระบบป้องกันการคัดลอก / ป้องกันแคปหน้าจอ
+// ------------------------------------------
+
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   if (e.key === "PrintScreen" || (e.ctrlKey && (e.key === "p" || e.key === "s")) || e.key === "F12") {

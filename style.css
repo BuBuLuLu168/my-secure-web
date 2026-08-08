@@ -1,237 +1,341 @@
+/* Custom CSS - My KeySpace Cream & Peach Pastel Theme */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Prompt', 'Itim', sans-serif;
 }
 
 body {
-  background-color: #FAF6F0;
-  font-family: 'Itim', cursive, sans-serif;
-  color: #523A36;
+  background-color: #FFF9F5;
+  color: #4A3E3D;
   min-height: 100vh;
+  padding-bottom: 40px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-/* Navbar สไตล์ครีมพีชละมุน */
+/* Navbar */
 .navbar {
-  width: 100%;
-  background-color: #ffffff;
-  border-bottom: 2px solid #F3E8E1;
+  background: #FFFFFF;
+  border-bottom: 2px solid #FFE5D9;
   padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(226, 169, 155, 0.15);
+}
+
+.nav-container {
+  max-width: 900px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(82, 58, 54, 0.04);
 }
 
-.nav-brand {
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 20px;
-  font-weight: bold;
-  color: #523A36;
-  cursor: pointer;
+  font-weight: 600;
+  color: #E2A99B;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .badge-status {
-  background-color: #F8ECE6;
-  color: #523A36;
-  padding: 6px 14px;
-  border-radius: 20px;
+  background-color: #F0E8E6;
+  color: #8E756C;
   font-size: 13px;
-  font-weight: bold;
-  border: 1px solid #EAD8CE;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
 }
 
 .badge-online {
   background-color: #E8F5E9;
-  color: #2D5A27;
-  border-color: #B2D8B0;
+  color: #2E7D32;
+}
+
+/* Dropdown Menu */
+.dropdown {
+  position: relative;
+  display: inline-block;
 }
 
 .menu-btn {
-  background: #F8ECE6;
-  border: 1px solid #EAD8CE;
-  color: #523A36;
+  background: #FFF3EC;
+  border: 1px solid #FFE5D9;
+  color: #8E756C;
   font-size: 18px;
-  padding: 5px 12px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s;
 }
 
 .menu-btn:hover {
-  background: #F0DED3;
+  background: #FFE5D9;
 }
 
-.dropdown-menu {
+.dropdown-content {
   display: none;
   position: absolute;
-  top: 60px;
-  right: 20px;
-  background-color: #ffffff;
-  border: 2px solid #F3E8E1;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(82, 58, 54, 0.08);
-  width: 180px;
+  right: 0;
+  top: 42px;
+  background-color: #FFFFFF;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  border: 1px solid #FFE5D9;
   overflow: hidden;
-  flex-direction: column;
-  z-index: 1001;
+  z-index: 101;
 }
 
-.dropdown-menu.show {
-  display: flex;
-  animation: fadeInDown 0.2s ease-in-out;
-}
-
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.menu-item {
+.dropdown-content a {
+  color: #4A3E3D;
   padding: 12px 16px;
-  color: #523A36;
   text-decoration: none;
-  font-size: 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #FAF0EA;
-  transition: 0.2s;
+  display: block;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
-.menu-item:last-child { border-bottom: none; }
-.menu-item:hover { background-color: #FCF4EF; color: #D48C7C; }
-.logout-item { color: #d9534f; }
-.logout-item:hover { background-color: #FDF2F2; }
-
-.main-container {
-  padding: 30px 20px;
-  max-width: 500px;
-  margin: 0 auto;
+.dropdown-content a:hover {
+  background-color: #FFF9F5;
 }
 
-/* หน้าเข้าสู่ระบบ */
-#login-box {
-  background: #ffffff;
-  padding: 35px 25px;
-  border-radius: 24px;
-  box-shadow: 0 10px 25px rgba(82, 58, 54, 0.06);
-  text-align: center;
-  border: 2px solid #F3E8E1;
+.dropdown-content.show {
+  display: block;
 }
 
-.icon-header { font-size: 42px; margin-bottom: 10px; }
-#login-box h2 { color: #523A36; margin-bottom: 6px; }
-.subtitle { color: #8E756C; font-size: 14px; margin-bottom: 22px; }
+/* Layout Container */
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 0 15px;
+}
 
-#login-box input {
+.card-box {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #FFE5D9;
+  box-shadow: 0 8px 24px rgba(226, 169, 155, 0.12);
+}
+
+h2 {
+  color: #8E756C;
+  font-weight: 600;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #A08C85;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.user-highlight {
+  color: #E2A99B;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #6C5A55;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-group input {
   width: 100%;
   padding: 12px 16px;
-  margin-bottom: 12px;
-  border: 2px solid #F3E8E1;
-  border-radius: 14px;
-  font-family: 'Itim', cursive;
+  border: 1.5px solid #FFE5D9;
+  border-radius: 12px;
   font-size: 15px;
+  background-color: #FFF9F5;
+  color: #4A3E3D;
   outline: none;
-  background-color: #FCF9F5;
-  color: #523A36;
+  transition: border-color 0.2s;
 }
 
-#login-box input:focus { border-color: #E2A99B; background-color: #ffffff; }
+.form-group input:focus {
+  border-color: #E2A99B;
+}
 
-#login-box button {
+.btn-primary {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background-color: #E2A99B;
-  color: #ffffff;
+  color: #FFFFFF;
   border: none;
-  border-radius: 14px;
-  font-family: 'Itim', cursive;
+  border-radius: 12px;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
-  font-weight: bold;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 4px 12px rgba(226, 169, 155, 0.3);
 }
 
-#login-box button:hover { background-color: #D49586; }
+.btn-primary:hover {
+  background-color: #D39788;
+}
 
-/* คลังไฟล์ */
-.header-bar h1 { font-size: 22px; color: #523A36; }
-.header-bar p { color: #8E756C; margin-top: 4px; margin-bottom: 20px; }
+.btn-primary:active {
+  transform: scale(0.98);
+}
 
-/* ช่องค้นหาไฟล์ */
+.error-text {
+  color: #d9534f;
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Search Box */
 .search-box {
-  margin-bottom: 20px;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #A08C85;
 }
 
 .search-box input {
   width: 100%;
-  padding: 12px 18px;
-  border: 2px solid #F3E8E1;
-  border-radius: 16px;
-  font-family: 'Itim', cursive;
-  font-size: 15px;
+  padding: 12px 16px 12px 42px;
+  border: 1.5px solid #FFE5D9;
+  border-radius: 12px;
+  font-size: 14px;
+  background-color: #FFF9F5;
   outline: none;
-  background-color: #ffffff;
-  color: #523A36;
-  box-shadow: 0 4px 10px rgba(82, 58, 54, 0.03);
-  transition: 0.2s;
 }
 
 .search-box input:focus {
   border-color: #E2A99B;
-  box-shadow: 0 4px 14px rgba(82, 58, 54, 0.08);
 }
 
-.file-grid { display: flex; flex-direction: column; gap: 15px; }
+/* File Cards Grid */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
 
 .file-card {
-  background: #ffffff;
-  padding: 18px 20px;
-  border-radius: 18px;
-  border: 2px solid #F3E8E1;
-  box-shadow: 0 4px 12px rgba(82, 58, 54, 0.04);
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.file-card:hover { transform: translateY(-2px); border-color: #E2A99B; }
-.card-icon { font-size: 28px; margin-bottom: 6px; }
-.file-card h3 { color: #523A36; font-size: 18px; }
-.file-card p { color: #8E756C; font-size: 13px; margin-top: 2px; }
-.btn-open { display: inline-block; margin-top: 10px; color: #D48C7C; font-weight: bold; font-size: 14px; }
-
-/* การ์ด Coming Soon */
-.coming-soon-card {
-  border: 2px dashed #E2A99B !important;
-  background-color: #FCF9F5 !important;
-  opacity: 0.85;
-  cursor: default !important;
-}
-.coming-soon-card:hover { transform: none !important; }
-
-/* หน้าอ่าน PDF */
-.btn-back {
-  background: #F8ECE6;
-  color: #523A36;
-  border: 1px solid #EAD8CE;
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-family: 'Itim', cursive;
-  cursor: pointer;
-  margin-bottom: 15px;
-  font-weight: bold;
-}
-
-.topic-card {
-  background: #ffffff;
+  background: #FFF9F5;
+  border: 1.5px solid #FFE5D9;
+  border-radius: 16px;
   padding: 20px;
-  border-radius: 20px;
-  border: 2px solid #F3E8E1;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.file-card:hover {
+  transform: translateY(-4px);
+  border-color: #E2A99B;
+  box-shadow: 0 6px 16px rgba(226, 169, 155, 0.2);
+}
+
+.card-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.file-card h3 {
+  font-size: 15px;
+  color: #4A3E3D;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.file-card p {
+  font-size: 12px;
+  color: #A08C85;
+  margin-bottom: 12px;
+}
+
+.btn-open {
+  display: inline-block;
+  font-size: 13px;
+  color: #E2A99B;
+  font-weight: 600;
+}
+
+.coming-soon-card {
+  background: #FAF8F6;
+  border: 1.5px dashed #D3C5C0;
+  cursor: default;
+  opacity: 0.8;
+}
+
+.coming-soon-card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #D3C5C0;
+}
+
+/* PDF Content Viewer */
+.content-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #FFE5D9;
+}
+
+.btn-back {
+  background: #FFF3EC;
+  border: 1px solid #FFE5D9;
+  color: #8E756C;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background: #FFE5D9;
+}
+
+.pdf-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }

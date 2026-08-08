@@ -3,84 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- กำหนดชื่อและพรีวิวเวลาส่งลิงก์ใน LINE / Facebook -->
-  <title>My KeySpace</title>
-  <meta name="description" content="My KeySpace - คลังเฉลยเอกสาร">
-  <meta property="og:title" content="My KeySpace">
-  <meta property="og:site_name" content="My KeySpace">
-  <meta property="og:description" content="My KeySpace - คลังเฉลยเอกสาร">
-  <meta property="og:type" content="website">
-
+  <title>My KeySpace - คลังเฉลยเอกสาร</title>
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-javascript@2"></script>
+  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- แถบ Navbar สีครีมพีชชิดขอบบน -->
+  <!-- Navbar / Header -->
   <nav class="navbar">
-    <div class="nav-brand" onclick="location.reload()">🔑 My KeySpace</div>
-    
-    <div class="nav-right">
-      <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
-      <button class="menu-btn" onclick="toggleMenu()">☰</button>
-    </div>
+    <div class="nav-container">
+      <div class="logo">
+        <span class="logo-icon">🔑</span>
+        <span class="logo-text">My KeySpace</span>
+      </div>
 
-    <!-- เมนูดรอปดาวน์ -->
-    <div id="dropdown-menu" class="dropdown-menu">
-      <a class="menu-item" onclick="showRules()">📢 กฎการใช้งาน</a>
-      <a class="menu-item" href="https://line.me/ti/p/qdWRxhabzh" target="_blank">💬 ติดต่อแอดมิน</a>
-      <a id="menu-logout" class="menu-item logout-item" style="display: none;" onclick="logout()">🚪 ออกจากระบบ</a>
+      <div class="nav-right">
+        <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
+        <div class="dropdown">
+          <button class="menu-btn" onclick="toggleMenu()">☰</button>
+          <div id="dropdown-menu" class="dropdown-content">
+            <a href="#" onclick="showRules(); return false;">⚠️ กฎการใช้งาน</a>
+            <a href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
+            <a href="#" id="menu-logout" onclick="logout(); return false;" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 
-  <!-- พื้นที่เนื้อหาหลัก -->
-  <div class="main-container">
-    
-    <!-- 1. หน้าเข้าสู่ระบบ -->
-    <div id="login-box">
-      <div class="icon-header">🔑</div>
-      <h2>เข้าสู่ระบบ</h2>
-      <p class="subtitle">กรอกชื่อและรหัสผ่านเพื่อเข้าใช้งานนะ</p>
-      
-      <input type="text" id="username" placeholder="ชื่อผู้ใช้งานของคุณ">
-      <input type="password" id="access-code" placeholder="รหัสผ่าน">
-      <button onclick="checkAccess()">เข้าสู่ระบบ ✨</button>
-      
-      <p id="error-msg" style="color: #d9534f; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
+  <main class="container">
+
+    <!-- 1. หน้าต่างเข้าสู่ระบบ (Login Box) -->
+    <div id="login-box" class="card-box">
+      <h2>🔐 เข้าสู่ระบบ</h2>
+      <p class="subtitle">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าชมคลังเฉลย</p>
+
+      <div class="form-group">
+        <label for="username">ชื่อผู้ใช้ (Username)</label>
+        <input type="text" id="username" placeholder="เช่น pakjira หรือ bubu" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="access-code">รหัสผ่าน (Password)</label>
+        <input type="password" id="access-code" placeholder="เช่น เลขท้ายสลิปโอนเงิน">
+      </div>
+
+      <p id="error-msg" class="error-text" style="display: none;"></p>
+
+      <button class="btn-primary" onclick="checkAccess()">เข้าสู่ระบบ</button>
     </div>
 
-    <!-- 2. หน้าเลือกไฟล์ -->
-    <div id="dashboard-box" style="display: none;">
-      <div class="header-bar">
-        <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
-        <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#d48c7c;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
+    <!-- 2. หน้าหลักคลังไฟล์ (Dashboard Box) -->
+    <div id="dashboard-box" class="card-box" style="display: none;">
+      <div class="dashboard-header">
+        <div>
+          <h2>📚 คลังเฉลยของคุณ <span id="user-display-name" class="user-highlight"></span></h2>
+          <p class="subtitle">เลือกวิชาที่ต้องการเปิดอ่านได้เลยน้า</p>
+        </div>
       </div>
 
       <!-- ช่องค้นหาไฟล์ -->
       <div class="search-box">
-        <input type="text" id="search-input" placeholder="🔍 พิมพ์ชื่อวิชาเพื่อค้นหา..." oninput="filterFiles()">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="ค้นหาชื่อวิชาหรือเอกสาร..." oninput="filterFiles()">
       </div>
 
-      <div id="file-grid" class="file-grid"></div>
-    </div>
-
-    <!-- 3. หน้าอ่านเนื้อหาไฟล์ PDF -->
-    <div id="content-box" style="display: none;">
-      <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
-      <div class="topic-card">
-        <h2 id="pdf-title" style="color: #523a36; margin-bottom: 20px;">ชื่อไฟล์</h2>
-        <div id="pdf-container" style="width: 100%; text-align: center; position: relative;"></div>
+      <!-- ตารางแสดงการ์ดไฟล์ -->
+      <div id="file-grid" class="file-grid">
+        <!-- Javascript จะดึงไฟล์มาแสดงตรงนี้ -->
       </div>
     </div>
 
-  </div>
+    <!-- 3. หน้าเปิดอ่านเอกสาร PDF (Content Box) -->
+    <div id="content-box" class="card-box" style="display: none;">
+      <div class="content-header">
+        <button class="btn-back" onclick="backToDashboard()">← กลับหน้าหลัก</button>
+        <h2 id="pdf-title">ชื่อไฟล์เฉลย</h2>
+      </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <!-- คอนเทนเนอร์สำหรับวาด Canvas PDF -->
+      <div id="pdf-container" class="pdf-container">
+        <!-- PDF pages rendered here -->
+      </div>
+    </div>
+
+  </main>
+
   <script src="script.js"></script>
 </body>
 </html>
