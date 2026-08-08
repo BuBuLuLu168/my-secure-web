@@ -67,36 +67,63 @@ async function checkAccess() {
   loadFileList();
 }
 
-// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
+// ฟังก์ชันดึงเฉพาะไฟล์ที่ผู้ใช้มีสิทธิ์อ่านจาก Supabase
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
-  fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C;'>กำลังโหลดรายการไฟล์...</p>";
+  fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C;'>กำลังตรวจสอบสิทธิ์เข้าถึงไฟล์...</p>";
 
-  const { data, error } = await _supabase.storage.from('pdf-files').list();
+  // 1. ดึงรายการไฟล์ที่ผู้ใช้คนนี้มีสิทธิ์จากตาราง user_permissions
+  const { data: userPerms, error: permError } = await _supabase
+    .from('user_permissions')
+    .select('file_name')
+    .eq('username', currentLoggedInUser);
 
   fileGrid.innerHTML = "";
 
-  if (data && data.length > 0) {
-    data.forEach((file) => {
+  if (permError || !userPerms || userPerms.length === 0) {
+    fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C; padding:20px;'>🔒 คุณยังไม่มีสิทธิ์เข้าถึงไฟล์เฉลยในขณะนี้ กรุณาติดต่อแอดมินน้า</p>";
+    appendComingSoonCard(fileGrid);
+    return;
+  }
+
+  // แปลงรายชื่อไฟล์ที่ได้รับอนุญาตให้อยู่ในรูป Array
+  const allowedFileNames = userPerms.map(p => p.file_name);
+
+  // 2. ดึงไฟล์ทั้งหมดจาก Storage
+  const { data: storageFiles, error: storageError } = await _supabase.storage.from('pdf-files').list();
+
+  if (storageFiles && storageFiles.length > 0) {
+    storageFiles.forEach((file) => {
       if (file.name.startsWith('.')) return;
 
-      const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
+      // แสดงเฉพาะไฟล์ที่มีชื่อตรงกับสิทธิ์ในตาราง user_permissions เท่านั้น
+      if (allowedFileNames.includes(file.name)) {
+        const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
 
-      const card = document.createElement("div");
-      card.className = "file-card";
-      card.onclick = () => openPdfViewer(file.name, fileUrl);
+        const card = document.createElement("div");
+        card.className = "file-card";
+        card.onclick = () => openPdfViewer(file.name, fileUrl);
 
-      card.innerHTML = `
-        <div class="card-icon">📄</div>
-        <h3>${file.name.replace('.pdf', '')}</h3>
-        <p>ไฟล์ PDF เอกสารเฉลย</p>
-        <span class="btn-open">เปิดอ่านเนื้อหา →</span>
-      `;
-      fileGrid.appendChild(card);
+        card.innerHTML = `
+          <div class="card-icon">📄</div>
+          <h3>${file.name.replace('.pdf', '')}</h3>
+          <p>ไฟล์ PDF เอกสารเฉลย</p>
+          <span class="btn-open">เปิดอ่านเนื้อหา →</span>
+        `;
+        fileGrid.appendChild(card);
+      }
     });
   }
 
-  // การ์ด Coming Soon ต่อท้ายเสมอ
+  appendComingSoonCard(fileGrid);
+
+  if (document.getElementById("search-input").value) {
+    filterFiles();
+  }
+}
+
+// ฟังก์ชันเพิ่มการ์ด Coming Soon ต่อท้าย
+function appendComingSoonCard(container) {
   const comingSoonCard = document.createElement("div");
   comingSoonCard.className = "file-card coming-soon-card";
   comingSoonCard.innerHTML = `
@@ -104,11 +131,7 @@ async function loadFileList() {
     <h3>Coming soon...</h3>
     <p>กำลังเตรียมไฟล์เฉลยใหม่ๆ เร็วๆ นี้จ้า</p>
   `;
-  fileGrid.appendChild(comingSoonCard);
-
-  if (document.getElementById("search-input").value) {
-    filterFiles();
-  }
+  container.appendChild(comingSoonCard);
 }
 
 // ฟังก์ชันค้นหาไฟล์ Real-time
@@ -131,7 +154,7 @@ function filterFiles() {
   });
 }
 
-// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้ (โทนพีชละมุน)
+// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
@@ -173,7 +196,7 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // วาดลายน้ำพาดเอียงฝังลง Canvas (สีพีชจางๆ)
+      // วาดลายน้ำพาดเอียงฝังลง Canvas
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 32px 'Itim', sans-serif";
