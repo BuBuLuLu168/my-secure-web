@@ -48,12 +48,12 @@
 
       <div class="form-group">
         <label for="username">ชื่อผู้ใช้ (Username)</label>
-        <input type="text" id="username" placeholder="เช่น pakjira หรือ bubu" autocomplete="off">
+        <input type="text" id="username" autocomplete="off">
       </div>
 
       <div class="form-group">
         <label for="access-code">รหัสผ่าน (Password)</label>
-        <input type="password" id="access-code" placeholder="เช่น เลขท้ายสลิปโอนเงิน">
+        <input type="password" id="access-code">
       </div>
 
       <p id="error-msg" class="error-text" style="display: none;"></p>
@@ -73,7 +73,7 @@
       <!-- ช่องค้นหาไฟล์ -->
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="ค้นหาชื่อวิชาหรือเอกสาร..." oninput="filterFiles()">
+        <input type="text" id="search-input" oninput="filterFiles()">
       </div>
 
       <!-- ตารางแสดงการ์ดไฟล์ -->
