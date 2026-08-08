@@ -13,28 +13,27 @@
 </head>
 <body>
 
-  <!-- แถบ Header & Navbar สไตล์ GitHub ชิดขอบ 100% -->
-  <header class="github-header">
-    <div class="top-bar">
-      <div class="brand-logo" onclick="location.reload()">🔑 My KeySpace</div>
-      <div class="user-status">
-        <span id="status-badge" class="badge-offline">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
-        <button id="btn-logout-nav" class="btn-logout" style="display: none;" onclick="logout()">ออกจากระบบ 🚪</button>
-      </div>
-    </div>
+  <!-- แถบ Navbar สีครีมมินิมอล ชิดขอบบน -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="location.reload()">🔑 My KeySpace</div>
     
-    <!-- เมนูแท็บยาวเรียงแถว -->
-    <nav class="tab-nav">
-      <a class="tab-item active" onclick="switchTab('dashboard')">📚 คลังเฉลย</a>
-      <a class="tab-item" onclick="alert('⚠️ ข้อควรระวัง: ห้ามบันทึกภาพ แคปหน้าจอ หรือคัดลอกเอกสารไปเผยแพร่โดยเด็ดขาด')">📢 กฎการใช้งาน</a>
-      <a class="tab-item" href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
-    </nav>
-  </header>
+    <div class="nav-right">
+      <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
 
-  <!-- Container หลักสำหรับเนื้อหา -->
+    <!-- เมนูดรอปดาวน์ เลื่อนลงมาเมื่อกดขีดสามขีด -->
+    <div id="dropdown-menu" class="dropdown-menu">
+      <a class="menu-item" onclick="showRules()">📢 กฎการใช้งาน</a>
+      <a class="menu-item" href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
+      <a id="menu-logout" class="menu-item logout-item" style="display: none;" onclick="logout()">🚪 ออกจากระบบ</a>
+    </div>
+  </nav>
+
+  <!-- พื้นที่เนื้อหาหลัก -->
   <div class="main-container">
     
-    <!-- 1. หน้าเข้าสู่ระบบ -->
+    <!-- 1. หน้าเข้าสู่ระบบ (กล่องน่ารักแบบเดิม) -->
     <div id="login-box">
       <div class="icon-header">🔑</div>
       <h2>เข้าสู่ระบบ</h2>

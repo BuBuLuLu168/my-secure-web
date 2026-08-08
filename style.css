@@ -1,4 +1,3 @@
-/* ลบระยะเว้นขอบหน้าเว็บทั้งหมด */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,90 +5,281 @@
 }
 
 body {
-  background-color: #fcfaf7;
+  background-color: #faf6f0;
   font-family: 'Itim', cursive, sans-serif;
+  color: #4a3b32;
   min-height: 100vh;
 }
 
-/* แถบ GitHub Header ชิดขอบ 100% */
-.github-header {
+/* Navbar สีครีมน่ารัก ชิดขอบบน */
+.navbar {
   width: 100%;
-  background-color: #1f2328;
-  color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.top-bar {
+  background-color: #ffffff;
+  border-bottom: 2px solid #f0e6df;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid #30363d;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(140, 109, 83, 0.05);
 }
 
-.brand-logo {
+.nav-brand {
   font-size: 20px;
   font-weight: bold;
+  color: #7a5c43;
   cursor: pointer;
-  color: #f0f6fc;
 }
 
-.badge-offline {
-  background-color: #30363d;
-  color: #8d96a0;
-  padding: 5px 12px;
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge-status {
+  background-color: #f5ebe6;
+  color: #7a5c43;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
+  font-weight: bold;
+  border: 1px solid #ebd8ce;
 }
 
 .badge-online {
-  background-color: #238636;
-  color: #ffffff;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+.menu-btn {
+  background: #f7ede2;
+  border: 1px solid #e0d0c1;
+  color: #7a5c43;
+  font-size: 18px;
   padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-}
-
-/* เมนูแท็บแถวที่สอง */
-.tab-nav {
-  display: flex;
-  background-color: #161b22;
-  padding: 0 15px;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.tab-item {
-  color: #8d96a0;
-  padding: 10px 16px;
-  font-size: 14px;
-  text-decoration: none;
+  border-radius: 12px;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
   transition: 0.2s;
 }
 
-.tab-item:hover, .tab-item.active {
-  color: #f0f6fc;
-  border-bottom: 2px solid #f78166;
+.menu-btn:hover {
+  background: #ebd8ce;
 }
 
+/* Dropdown Menu สีครีมนุ่มนวล เลื่อนลงมาจากมุมขวา */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: #ffffff;
+  border: 2px solid #f0e6df;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(120, 90, 70, 0.12);
+  width: 180px;
+  overflow: hidden;
+  flex-direction: column;
+  z-index: 1001;
+}
+
+.dropdown-menu.show {
+  display: flex;
+  animation: fadeInDown 0.2s ease-in-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  padding: 12px 16px;
+  color: #5c4a3d;
+  text-decoration: none;
+  font-size: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #f7f0ea;
+  transition: 0.2s;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:hover {
+  background-color: #fcf4ec;
+  color: #8c6d53;
+}
+
+.logout-item {
+  color: #d9534f;
+}
+
+.logout-item:hover {
+  background-color: #fdf2f2;
+}
+
+/* กล่องเนื้อหาหลัก */
 .main-container {
-  padding: 20px;
-  max-width: 1000px;
+  padding: 30px 20px;
+  max-width: 500px;
   margin: 0 auto;
 }
 
-.btn-logout {
-  background-color: #da3633;
+/* หน้าเข้าสู่ระบบน่ารักโทนอบอุ่น */
+#login-box {
+  background: #ffffff;
+  padding: 35px 25px;
+  border-radius: 24px;
+  box-shadow: 0 10px 25px rgba(140, 109, 83, 0.08);
+  text-align: center;
+  border: 2px solid #f3ece4;
+}
+
+.icon-header {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+#login-box h2 {
+  color: #7a5c43;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #9e8a78;
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+#login-box input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border: 2px solid #eee4db;
+  border-radius: 14px;
+  font-family: 'Itim', cursive;
+  font-size: 15px;
+  outline: none;
+  background-color: #faf7f4;
+  color: #4a3b32;
+}
+
+#login-box input:focus {
+  border-color: #cbb29d;
+  background-color: #ffffff;
+}
+
+#login-box button {
+  width: 100%;
+  padding: 12px;
+  background-color: #cbb29d;
   color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 14px;
+  font-family: 'Itim', cursive;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: bold;
+}
+
+#login-box button:hover {
+  background-color: #b59a83;
+}
+
+/* คลังไฟล์ */
+.header-bar h1 {
+  font-size: 22px;
+  color: #7a5c43;
+}
+
+.header-bar p {
+  color: #9e8a78;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+.file-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.file-card {
+  background: #ffffff;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 2px solid #f0e6df;
+  box-shadow: 0 4px 12px rgba(140, 109, 83, 0.05);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.file-card:hover {
+  transform: translateY(-2px);
+  border-color: #d6beaa;
+}
+
+.card-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.file-card h3 {
+  color: #6e5038;
+  font-size: 18px;
+}
+
+.file-card p {
+  color: #a08c7c;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.btn-open {
+  display: inline-block;
+  margin-top: 10px;
+  color: #b59a83;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* หน้าอ่าน PDF */
+.btn-back {
+  background: #ebd8ce;
+  color: #6e5038;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
   font-family: 'Itim', cursive;
   cursor: pointer;
-  margin-left: 10px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.topic-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 20px;
+  border: 2px solid #f0e6df;
+}
+
+#watermark {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  font-size: 12px;
+  color: rgba(120, 90, 70, 0.3);
+  pointer-events: none;
 }

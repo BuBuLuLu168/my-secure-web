@@ -7,6 +7,27 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // ตั้งค่าตัวแปลง PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// เปิด / ปิด เมนูดรอปดาวน์ขีดสามขีด
+function toggleMenu() {
+  const menu = document.getElementById("dropdown-menu");
+  menu.classList.toggle("show");
+}
+
+// ปิดเมนูอัตโนมัติเมื่อกดคลิกที่อื่น
+window.addEventListener("click", (e) => {
+  if (!e.target.matches('.menu-btn')) {
+    const menu = document.getElementById("dropdown-menu");
+    if (menu && menu.classList.contains("show")) {
+      menu.classList.remove("show");
+    }
+  }
+});
+
+// แสดงแจ้งเตือนกฎการใช้งาน
+function showRules() {
+  alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
+}
+
 // เช็กรหัสผ่านเข้าสู่ระบบ
 async function checkAccess() {
   const user = document.getElementById("username").value.trim();
@@ -36,17 +57,16 @@ async function checkAccess() {
   document.getElementById("login-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   
-  // อัปเดตสถานะป้ายผู้ใช้และปุ่มล็อกเอาต์บน Navbar สไตล์ GitHub
+  // อัปเดตป้ายสถานะปุ่ม Navbar และแสดงเมนูล็อกเอาต์
   const statusBadge = document.getElementById("status-badge");
-  statusBadge.className = "badge-online";
+  statusBadge.className = "badge-status badge-online";
   statusBadge.innerText = `👤 ${user}`;
-  document.getElementById("btn-logout-nav").style.display = "inline-block";
+  document.getElementById("menu-logout").style.display = "block";
 
   // แสดงชื่อผู้ใช้ในหน้าคลังไฟล์ และตั้งค่าลายน้ำ
   document.getElementById("user-display-name").innerText = user;
   document.getElementById("watermark").innerText = `${user} - ${new Date().toLocaleTimeString()}`;
 
-  // โหลดรายการไฟล์ PDF ทั้งหมด
   loadFileList();
 }
 
@@ -83,7 +103,7 @@ async function loadFileList() {
   });
 }
 
-// ฟังก์ชันเปิดดูไฟล์ PDF (เรนเดอร์ความละเอียดสูง HD คมชัดบนมือถือ)
+// ฟังก์ชันเปิดดูไฟล์ PDF ความละเอียดสูง
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
@@ -136,40 +156,23 @@ function backToDashboard() {
   document.getElementById("pdf-container").innerHTML = "";
 }
 
-// ฟังก์ชันออกจากระบบ (Logout)
+// ฟังก์ชันออกจากระบบ
 function logout() {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "none";
   document.getElementById("login-box").style.display = "block";
-  document.getElementById("btn-logout-nav").style.display = "none";
+  document.getElementById("menu-logout").style.display = "none";
 
-  // คืนค่าสถานะใน Navbar
   const statusBadge = document.getElementById("status-badge");
-  statusBadge.className = "badge-offline";
+  statusBadge.className = "badge-status";
   statusBadge.innerText = "🔒 ยังไม่ได้เข้าสู่ระบบ";
   
-  // ล้างค่าช่องกรอก
   document.getElementById("username").value = "";
   document.getElementById("access-code").value = "";
   document.getElementById("pdf-container").innerHTML = "";
 }
 
-// ฟังก์ชันสลับแท็บเมนู
-function switchTab(tabName) {
-  if (tabName === 'dashboard') {
-    const isLogin = document.getElementById("btn-logout-nav").style.display !== "none";
-    if (!isLogin) {
-      alert("กรุณาเข้าสู่ระบบก่อนเลือกดูคลังเฉลยนะ!");
-      return;
-    }
-    document.getElementById("content-box").style.display = "none";
-    document.getElementById("dashboard-box").style.display = "block";
-  }
-}
-
-// ------------------------------------
-// ระบบ Pull-to-Refresh (ดึงหน้าจอลงเพื่อโหลดไฟล์ใหม่)
-// ------------------------------------
+// ระบบ Pull-to-Refresh
 let touchStartY = 0;
 let touchEndY = 0;
 
