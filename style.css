@@ -5,17 +5,17 @@
 }
 
 body {
-  background-color: #faf6f0;
+  background-color: #F4F7F4;
   font-family: 'Itim', cursive, sans-serif;
-  color: #4a3b32;
+  color: #3A4D39;
   min-height: 100vh;
 }
 
-/* Navbar ชิดขอบบน */
+/* Navbar สไตล์มัทฉะลาเต้ */
 .navbar {
   width: 100%;
   background-color: #ffffff;
-  border-bottom: 2px solid #f0e6df;
+  border-bottom: 2px solid #E0E7E1;
   padding: 12px 20px;
   display: flex;
   justify-content: space-between;
@@ -23,13 +23,13 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(140, 109, 83, 0.05);
+  box-shadow: 0 2px 10px rgba(58, 77, 57, 0.05);
 }
 
 .nav-brand {
   font-size: 20px;
   font-weight: bold;
-  color: #7a5c43;
+  color: #3A4D39;
   cursor: pointer;
 }
 
@@ -40,25 +40,25 @@ body {
 }
 
 .badge-status {
-  background-color: #f5ebe6;
-  color: #7a5c43;
+  background-color: #E8EFE9;
+  color: #3A4D39;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: bold;
-  border: 1px solid #ebd8ce;
+  border: 1px solid #D0DDD2;
 }
 
 .badge-online {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border-color: #c8e6c9;
+  background-color: #D8EAD9;
+  color: #2D5A27;
+  border-color: #B2D8B0;
 }
 
 .menu-btn {
-  background: #f7ede2;
-  border: 1px solid #e0d0c1;
-  color: #7a5c43;
+  background: #E8EFE9;
+  border: 1px solid #C8D6CA;
+  color: #3A4D39;
   font-size: 18px;
   padding: 5px 12px;
   border-radius: 12px;
@@ -67,7 +67,7 @@ body {
 }
 
 .menu-btn:hover {
-  background: #ebd8ce;
+  background: #D8E2D9;
 }
 
 .dropdown-menu {
@@ -76,9 +76,9 @@ body {
   top: 60px;
   right: 20px;
   background-color: #ffffff;
-  border: 2px solid #f0e6df;
+  border: 2px solid #E0E7E1;
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(120, 90, 70, 0.12);
+  box-shadow: 0 8px 20px rgba(58, 77, 57, 0.1);
   width: 180px;
   overflow: hidden;
   flex-direction: column;
@@ -97,18 +97,18 @@ body {
 
 .menu-item {
   padding: 12px 16px;
-  color: #5c4a3d;
+  color: #3A4D39;
   text-decoration: none;
   font-size: 15px;
   cursor: pointer;
-  border-bottom: 1px solid #f7f0ea;
+  border-bottom: 1px solid #F0F4F0;
   transition: 0.2s;
 }
 
 .menu-item:last-child { border-bottom: none; }
-.menu-item:hover { background-color: #fcf4ec; color: #8c6d53; }
+.menu-item:hover { background-color: #F4F7F4; color: #588157; }
 .logout-item { color: #d9534f; }
-.logout-item:hover { background-color: #fdf2f2; }
+.logout-item:hover { background-color: #FDF2F2; }
 
 .main-container {
   padding: 30px 20px;
@@ -121,35 +121,35 @@ body {
   background: #ffffff;
   padding: 35px 25px;
   border-radius: 24px;
-  box-shadow: 0 10px 25px rgba(140, 109, 83, 0.08);
+  box-shadow: 0 10px 25px rgba(58, 77, 57, 0.06);
   text-align: center;
-  border: 2px solid #f3ece4;
+  border: 2px solid #E0E7E1;
 }
 
 .icon-header { font-size: 42px; margin-bottom: 10px; }
-#login-box h2 { color: #7a5c43; margin-bottom: 6px; }
-.subtitle { color: #9e8a78; font-size: 14px; margin-bottom: 22px; }
+#login-box h2 { color: #3A4D39; margin-bottom: 6px; }
+.subtitle { color: #738A72; font-size: 14px; margin-bottom: 22px; }
 
 #login-box input {
   width: 100%;
   padding: 12px 16px;
   margin-bottom: 12px;
-  border: 2px solid #eee4db;
+  border: 2px solid #E0E7E1;
   border-radius: 14px;
   font-family: 'Itim', cursive;
   font-size: 15px;
   outline: none;
-  background-color: #faf7f4;
-  color: #4a3b32;
+  background-color: #F9FAF9;
+  color: #3A4D39;
 }
 
-#login-box input:focus { border-color: #cbb29d; background-color: #ffffff; }
+#login-box input:focus { border-color: #A3B18A; background-color: #ffffff; }
 
 #login-box button {
   width: 100%;
   padding: 12px;
-  background-color: #cbb29d;
-  color: white;
+  background-color: #A3B18A;
+  color: #ffffff;
   border: none;
   border-radius: 14px;
   font-family: 'Itim', cursive;
@@ -159,11 +159,11 @@ body {
   font-weight: bold;
 }
 
-#login-box button:hover { background-color: #b59a83; }
+#login-box button:hover { background-color: #588157; }
 
 /* คลังไฟล์ */
-.header-bar h1 { font-size: 22px; color: #7a5c43; }
-.header-bar p { color: #9e8a78; margin-top: 4px; margin-bottom: 20px; }
+.header-bar h1 { font-size: 22px; color: #3A4D39; }
+.header-bar p { color: #738A72; margin-top: 4px; margin-bottom: 20px; }
 
 /* ช่องค้นหาไฟล์ */
 .search-box {
@@ -173,20 +173,20 @@ body {
 .search-box input {
   width: 100%;
   padding: 12px 18px;
-  border: 2px solid #f0e6df;
+  border: 2px solid #E0E7E1;
   border-radius: 16px;
   font-family: 'Itim', cursive;
   font-size: 15px;
   outline: none;
   background-color: #ffffff;
-  color: #4a3b32;
-  box-shadow: 0 4px 10px rgba(140, 109, 83, 0.04);
+  color: #3A4D39;
+  box-shadow: 0 4px 10px rgba(58, 77, 57, 0.03);
   transition: 0.2s;
 }
 
 .search-box input:focus {
-  border-color: #cbb29d;
-  box-shadow: 0 4px 14px rgba(140, 109, 83, 0.1);
+  border-color: #A3B18A;
+  box-shadow: 0 4px 14px rgba(58, 77, 57, 0.08);
 }
 
 .file-grid { display: flex; flex-direction: column; gap: 15px; }
@@ -195,32 +195,32 @@ body {
   background: #ffffff;
   padding: 18px 20px;
   border-radius: 18px;
-  border: 2px solid #f0e6df;
-  box-shadow: 0 4px 12px rgba(140, 109, 83, 0.05);
+  border: 2px solid #E0E7E1;
+  box-shadow: 0 4px 12px rgba(58, 77, 57, 0.04);
   cursor: pointer;
   transition: 0.2s;
 }
 
-.file-card:hover { transform: translateY(-2px); border-color: #d6beaa; }
+.file-card:hover { transform: translateY(-2px); border-color: #A3B18A; }
 .card-icon { font-size: 28px; margin-bottom: 6px; }
-.file-card h3 { color: #6e5038; font-size: 18px; }
-.file-card p { color: #a08c7c; font-size: 13px; margin-top: 2px; }
-.btn-open { display: inline-block; margin-top: 10px; color: #b59a83; font-weight: bold; font-size: 14px; }
+.file-card h3 { color: #3A4D39; font-size: 18px; }
+.file-card p { color: #738A72; font-size: 13px; margin-top: 2px; }
+.btn-open { display: inline-block; margin-top: 10px; color: #588157; font-weight: bold; font-size: 14px; }
 
 /* การ์ด Coming Soon */
 .coming-soon-card {
-  border: 2px dashed #d6beaa !important;
-  background-color: #fdfbf7 !important;
-  opacity: 0.8;
+  border: 2px dashed #A3B18A !important;
+  background-color: #F8FAF8 !important;
+  opacity: 0.85;
   cursor: default !important;
 }
 .coming-soon-card:hover { transform: none !important; }
 
 /* หน้าอ่าน PDF */
 .btn-back {
-  background: #ebd8ce;
-  color: #6e5038;
-  border: none;
+  background: #E8EFE9;
+  color: #3A4D39;
+  border: 1px solid #C8D6CA;
   padding: 8px 16px;
   border-radius: 12px;
   font-family: 'Itim', cursive;
@@ -233,5 +233,5 @@ body {
   background: #ffffff;
   padding: 20px;
   border-radius: 20px;
-  border: 2px solid #f0e6df;
+  border: 2px solid #E0E7E1;
 }

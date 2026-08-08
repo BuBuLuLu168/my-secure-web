@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- ตั้งค่าชื่อเว็บและพรีวิวเวลาส่งลิงก์ -->
   <title>My KeySpace</title>
+  <meta name="description" content="My KeySpace">
+  <meta property="og:title" content="My KeySpace">
+  <meta property="og:site_name" content="My KeySpace">
+  <meta property="og:description" content="My KeySpace">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
@@ -13,7 +20,7 @@
 </head>
 <body>
 
-  <!-- แถบ Navbar สีครีมมินิมอล ชิดขอบบน -->
+  <!-- แถบ Navbar สีมัทฉะมินิมอล ชิดขอบบน -->
   <nav class="navbar">
     <div class="nav-brand" onclick="location.reload()">🔑 My KeySpace</div>
     
@@ -43,14 +50,14 @@
       <input type="password" id="access-code" placeholder="รหัสผ่าน">
       <button onclick="checkAccess()">เข้าสู่ระบบ ✨</button>
       
-      <p id="error-msg" style="color: #e06d53; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
+      <p id="error-msg" style="color: #d9534f; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
     </div>
 
     <!-- 2. หน้าเลือกไฟล์ -->
     <div id="dashboard-box" style="display: none;">
       <div class="header-bar">
         <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
-        <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#a67c52;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
+        <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#588157;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
       </div>
 
       <!-- ช่องค้นหาไฟล์ -->
@@ -65,7 +72,7 @@
     <div id="content-box" style="display: none;">
       <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
       <div class="topic-card">
-        <h2 id="pdf-title" style="color: #8c6d53; margin-bottom: 20px;">ชื่อไฟล์</h2>
+        <h2 id="pdf-title" style="color: #3A4D39; margin-bottom: 20px;">ชื่อไฟล์</h2>
         <div id="pdf-container" style="width: 100%; text-align: center; position: relative;"></div>
       </div>
     </div>

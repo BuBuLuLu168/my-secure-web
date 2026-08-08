@@ -70,7 +70,7 @@ async function checkAccess() {
 // ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
-  fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78;'>กำลังโหลดรายการไฟล์...</p>";
+  fileGrid.innerHTML = "<p style='text-align:center; color:#738A72;'>กำลังโหลดรายการไฟล์...</p>";
 
   const { data, error } = await _supabase.storage.from('pdf-files').list();
 
@@ -106,7 +106,6 @@ async function loadFileList() {
   `;
   fileGrid.appendChild(comingSoonCard);
 
-  // รีเซ็ตการกรองค้นหาหลังโหลดไฟล์ใหม่
   if (document.getElementById("search-input").value) {
     filterFiles();
   }
@@ -132,14 +131,14 @@ function filterFiles() {
   });
 }
 
-// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้
+// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้ (โทนเขียวมัทฉะ)
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
 
   const container = document.getElementById("pdf-container");
-  container.innerHTML = "<p style='text-align:center; color:#9e8a78; font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
+  container.innerHTML = "<p style='text-align:center; color:#738A72; font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
 
   try {
     const loadingTask = pdfjsLib.getDocument(fileUrl);
@@ -174,11 +173,11 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // วาดลายน้ำพาดเอียงฝังลง Canvas
+      // วาดลายน้ำพาดเอียงฝังลง Canvas (สีเขียวจางๆ)
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 32px 'Itim', sans-serif";
-      context.fillStyle = "rgba(180, 140, 110, 0.22)";
+      context.fillStyle = "rgba(88, 129, 87, 0.18)";
       context.rotate(-25 * Math.PI / 180);
 
       for (let y = -canvas.height; y < canvas.height * 2; y += 180) {
@@ -189,7 +188,7 @@ async function openPdfViewer(fileName, fileUrl) {
       context.restore();
     }
   } catch (error) {
-    container.innerHTML = "<p style='color:#e06d53;'>ไม่สามารถเปิดไฟล์นี้ได้ กรุณาลองใหม่อีกครั้ง</p>";
+    container.innerHTML = "<p style='color:#d9534f;'>ไม่สามารถเปิดไฟล์นี้ได้ กรุณาลองใหม่อีกครั้ง</p>";
   }
 }
 
