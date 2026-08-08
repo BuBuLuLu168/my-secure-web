@@ -95,18 +95,15 @@ async function openPdfViewer(fileName, fileUrl) {
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       
-      // ปรับ Scale เป็น 2.5 เพื่อให้ภาพละเอียดสูง คมชัดบนจอมือถือ Retina / HD
       const scale = 2.5;
       const viewport = page.getViewport({ scale: scale });
 
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
       
-      // กำหนดความละเอียดจริงของภาพ
       canvas.height = viewport.height;
       canvas.width = viewport.width;
       
-      // แสดงผลพอดีหน้าจอมือถือโดยอัตโนมัติ
       canvas.style.width = "100%";
       canvas.style.height = "auto";
       canvas.style.marginBottom = "15px";
@@ -132,6 +129,29 @@ function backToDashboard() {
   document.getElementById("dashboard-box").style.display = "block";
   document.getElementById("pdf-container").innerHTML = "";
 }
+
+// ------------------------------------
+// ระบบ Pull-to-Refresh (ดึงหน้าจอลงเพื่อโหลดไฟล์ใหม่)
+// ------------------------------------
+let touchStartY = 0;
+let touchEndY = 0;
+
+window.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchend', (e) => {
+  touchEndY = e.changedTouches[0].clientY;
+  
+  // เช็กว่าอยู่หน้า dashboard และอยู่บนสุดของหน้าจอ
+  const isDashboardVisible = document.getElementById("dashboard-box").style.display !== "none";
+  const isAtTop = window.scrollY === 0;
+
+  // ถ้าดึงลงมามากกว่า 100px และอยู่จุดบนสุด ให้รีโหลดรายการไฟล์
+  if (isDashboardVisible && isAtTop && (touchEndY - touchStartY > 100)) {
+    loadFileList();
+  }
+}, { passive: true });
 
 // ป้องกันการคลิกขวา / แคปภาพ / คัดลอก
 document.addEventListener("contextmenu", (e) => e.preventDefault());
