@@ -34,15 +34,19 @@ async function checkAccess() {
   // เข้าสู่ระบบสำเร็จ
   errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
-  document.getElementById("main-nav").style.display = "flex"; // แสดง Navbar ด้านบน
   document.getElementById("dashboard-box").style.display = "block";
   
-  // แสดงชื่อผู้ใช้ใน Navbar และ Dashboard
+  // อัปเดตสถานะป้ายผู้ใช้และปุ่มล็อกเอาต์บน Navbar สไตล์ GitHub
+  const statusBadge = document.getElementById("status-badge");
+  statusBadge.className = "badge-online";
+  statusBadge.innerText = `👤 ${user}`;
+  document.getElementById("btn-logout-nav").style.display = "inline-block";
+
+  // แสดงชื่อผู้ใช้ในหน้าคลังไฟล์ และตั้งค่าลายน้ำ
   document.getElementById("user-display-name").innerText = user;
-  document.getElementById("nav-username").innerText = user;
   document.getElementById("watermark").innerText = `${user} - ${new Date().toLocaleTimeString()}`;
 
-  // โหลดรายการไฟล์ PDF ทั้งหมดอัตโนมัติ
+  // โหลดรายการไฟล์ PDF ทั้งหมด
   loadFileList();
 }
 
@@ -53,7 +57,6 @@ async function loadFileList() {
 
   const { data, error } = await _supabase.storage.from('pdf-files').list();
 
-  // กรณีในระบบยังไม่มีไฟล์ แสดงข้อความ Coming Soon
   if (error || !data || data.length === 0) {
     fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78; font-size:18px; padding:30px 0;'>⏳ ยังไม่มีรายการไฟล์ในขณะนี้ (Coming Soon...)</p>";
     return;
@@ -61,7 +64,6 @@ async function loadFileList() {
 
   fileGrid.innerHTML = "";
 
-  // วนลูปสร้างปุ่มไฟล์
   data.forEach((file) => {
     if (file.name.startsWith('.')) return;
 
@@ -94,9 +96,8 @@ async function openPdfViewer(fileName, fileUrl) {
     const loadingTask = pdfjsLib.getDocument(fileUrl);
     const pdf = await loadingTask.promise;
 
-    container.innerHTML = ""; // ล้างข้อความกำลังโหลด
+    container.innerHTML = "";
 
-    // วนลูปวาดเนื้อหา PDF ทุกหน้าลงบนหน้าเว็บ
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       
@@ -137,15 +138,33 @@ function backToDashboard() {
 
 // ฟังก์ชันออกจากระบบ (Logout)
 function logout() {
-  document.getElementById("main-nav").style.display = "none";
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "none";
   document.getElementById("login-box").style.display = "block";
+  document.getElementById("btn-logout-nav").style.display = "none";
+
+  // คืนค่าสถานะใน Navbar
+  const statusBadge = document.getElementById("status-badge");
+  statusBadge.className = "badge-offline";
+  statusBadge.innerText = "🔒 ยังไม่ได้เข้าสู่ระบบ";
   
-  // ล้างค่าข้อมูล
+  // ล้างค่าช่องกรอก
   document.getElementById("username").value = "";
   document.getElementById("access-code").value = "";
   document.getElementById("pdf-container").innerHTML = "";
+}
+
+// ฟังก์ชันสลับแท็บเมนู
+function switchTab(tabName) {
+  if (tabName === 'dashboard') {
+    const isLogin = document.getElementById("btn-logout-nav").style.display !== "none";
+    if (!isLogin) {
+      alert("กรุณาเข้าสู่ระบบก่อนเลือกดูคลังเฉลยนะ!");
+      return;
+    }
+    document.getElementById("content-box").style.display = "none";
+    document.getElementById("dashboard-box").style.display = "block";
+  }
 }
 
 // ------------------------------------

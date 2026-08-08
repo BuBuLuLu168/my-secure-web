@@ -9,54 +9,65 @@
   <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   
-  <!-- ตัวแปลง PDF ป้องกันการเด้งเข้าแอป Drive -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
-  <!-- แท็บด้านบน (Navbar) -->
-  <nav id="main-nav" class="top-navbar" style="display: none;">
-    <div class="nav-brand">🔑 My KeySpace</div>
-    <div class="nav-right">
-      <span class="user-badge">👤 <span id="nav-username"></span></span>
-      <button class="btn-logout" onclick="logout()">ออกจากระบบ 🚪</button>
+  <!-- แถบ Header & Navbar สไตล์ GitHub ชิดขอบ 100% -->
+  <header class="github-header">
+    <div class="top-bar">
+      <div class="brand-logo" onclick="location.reload()">🔑 My KeySpace</div>
+      <div class="user-status">
+        <span id="status-badge" class="badge-offline">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
+        <button id="btn-logout-nav" class="btn-logout" style="display: none;" onclick="logout()">ออกจากระบบ 🚪</button>
+      </div>
     </div>
-  </nav>
-
-  <!-- 1. หน้าเข้าสู่ระบบ -->
-  <div id="login-box">
-    <div class="icon-header">🔑</div>
-    <h2>เข้าสู่ระบบ</h2>
-    <p class="subtitle">กรอกชื่อและรหัสผ่านเพื่อเข้าใช้งานนะ</p>
     
-    <input type="text" id="username" placeholder="ชื่อผู้ใช้งานของคุณ">
-    <input type="password" id="access-code" placeholder="รหัสผ่าน">
-    <button onclick="checkAccess()">เข้าสู่ระบบ ✨</button>
+    <!-- เมนูแท็บยาวเรียงแถว -->
+    <nav class="tab-nav">
+      <a class="tab-item active" onclick="switchTab('dashboard')">📚 คลังเฉลย</a>
+      <a class="tab-item" onclick="alert('⚠️ ข้อควรระวัง: ห้ามบันทึกภาพ แคปหน้าจอ หรือคัดลอกเอกสารไปเผยแพร่โดยเด็ดขาด')">📢 กฎการใช้งาน</a>
+      <a class="tab-item" href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
+    </nav>
+  </header>
+
+  <!-- Container หลักสำหรับเนื้อหา -->
+  <div class="main-container">
     
-    <p id="error-msg" style="color: #e06d53; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
-  </div>
-
-  <!-- 2. หน้าเลือกไฟล์ -->
-  <div id="dashboard-box" style="display: none;">
-    <div class="header-bar">
-      <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
-      <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#a67c52;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
+    <!-- 1. หน้าเข้าสู่ระบบ -->
+    <div id="login-box">
+      <div class="icon-header">🔑</div>
+      <h2>เข้าสู่ระบบ</h2>
+      <p class="subtitle">กรอกชื่อและรหัสผ่านเพื่อเข้าใช้งานนะ</p>
+      
+      <input type="text" id="username" placeholder="ชื่อผู้ใช้งานของคุณ">
+      <input type="password" id="access-code" placeholder="รหัสผ่าน">
+      <button onclick="checkAccess()">เข้าสู่ระบบ ✨</button>
+      
+      <p id="error-msg" style="color: #e06d53; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
     </div>
 
-    <div id="file-grid" class="file-grid"></div>
-  </div>
+    <!-- 2. หน้าเลือกไฟล์ -->
+    <div id="dashboard-box" style="display: none;">
+      <div class="header-bar">
+        <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
+        <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#a67c52;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
+      </div>
 
-  <!-- 3. หน้าอ่านเนื้อหาไฟล์ PDF (แสดงผ่าน Canvas) -->
-  <div id="content-box" style="display: none;">
-    <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
-    <div class="topic-card">
-      <h2 id="pdf-title" style="color: #8c6d53; margin-bottom: 20px;">ชื่อไฟล์</h2>
-      <!-- พื้นที่วาด PDF ลงบนหน้าเว็บ -->
-      <div id="pdf-container" style="width: 100%; text-align: center;"></div>
+      <div id="file-grid" class="file-grid"></div>
     </div>
+
+    <!-- 3. หน้าอ่านเนื้อหาไฟล์ PDF -->
+    <div id="content-box" style="display: none;">
+      <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
+      <div class="topic-card">
+        <h2 id="pdf-title" style="color: #8c6d53; margin-bottom: 20px;">ชื่อไฟล์</h2>
+        <div id="pdf-container" style="width: 100%; text-align: center;"></div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- ลายน้ำ -->
   <div id="watermark"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
