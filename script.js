@@ -8,11 +8,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 let currentLoggedInUser = "";
 
+// เปิด / ปิด เมนูดรอปดาวน์
 function toggleMenu() {
   const menu = document.getElementById("dropdown-menu");
   menu.classList.toggle("show");
 }
 
+// ปิดเมนูเมื่อคลิกข้างนอก
 window.addEventListener("click", (e) => {
   if (!e.target.matches('.menu-btn')) {
     const menu = document.getElementById("dropdown-menu");
@@ -22,10 +24,12 @@ window.addEventListener("click", (e) => {
   }
 });
 
+// แสดงแจ้งเตือนกฎการใช้งาน
 function showRules() {
   alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
 }
 
+// เช็กรหัสผ่านเข้าสู่ระบบ
 async function checkAccess() {
   const user = document.getElementById("username").value.trim();
   const code = document.getElementById("access-code").value.trim();
@@ -63,6 +67,7 @@ async function checkAccess() {
   loadFileList();
 }
 
+// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
   fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78;'>กำลังโหลดรายการไฟล์...</p>";
@@ -91,7 +96,7 @@ async function loadFileList() {
     });
   }
 
-  // เพิ่มการ์ด Coming Soon ต่อท้ายรายการเสมอ
+  // การ์ด Coming Soon ต่อท้ายเสมอ
   const comingSoonCard = document.createElement("div");
   comingSoonCard.className = "file-card coming-soon-card";
   comingSoonCard.innerHTML = `
@@ -100,8 +105,34 @@ async function loadFileList() {
     <p>กำลังเตรียมไฟล์เฉลยใหม่ๆ เร็วๆ นี้จ้า</p>
   `;
   fileGrid.appendChild(comingSoonCard);
+
+  // รีเซ็ตการกรองค้นหาหลังโหลดไฟล์ใหม่
+  if (document.getElementById("search-input").value) {
+    filterFiles();
+  }
 }
 
+// ฟังก์ชันค้นหาไฟล์ Real-time
+function filterFiles() {
+  const searchText = document.getElementById("search-input").value.toLowerCase().trim();
+  const cards = document.querySelectorAll(".file-card");
+
+  cards.forEach((card) => {
+    if (card.classList.contains("coming-soon-card")) {
+      card.style.display = "block";
+      return;
+    }
+
+    const title = card.querySelector("h3").innerText.toLowerCase();
+    if (title.includes(searchText)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+}
+
+// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
@@ -143,11 +174,11 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // --- วาดลายน้ำพาดเอียงฝังลงไปในเนื้อหา Canvas ---
+      // วาดลายน้ำพาดเอียงฝังลง Canvas
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 32px 'Itim', sans-serif";
-      context.fillStyle = "rgba(180, 140, 110, 0.22)"; // ลายน้ำสีน้ำตาลอ่อน จางๆ ไม่กวนตา
+      context.fillStyle = "rgba(180, 140, 110, 0.22)";
       context.rotate(-25 * Math.PI / 180);
 
       for (let y = -canvas.height; y < canvas.height * 2; y += 180) {
@@ -180,8 +211,28 @@ function logout() {
   
   document.getElementById("username").value = "";
   document.getElementById("access-code").value = "";
+  document.getElementById("search-input").value = "";
   document.getElementById("pdf-container").innerHTML = "";
 }
+
+// ระบบ Pull-to-Refresh
+let touchStartY = 0;
+let touchEndY = 0;
+
+window.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchend', (e) => {
+  touchEndY = e.changedTouches[0].clientY;
+  
+  const isDashboardVisible = document.getElementById("dashboard-box").style.display !== "none";
+  const isAtTop = window.scrollY === 0;
+
+  if (isDashboardVisible && isAtTop && (touchEndY - touchStartY > 100)) {
+    loadFileList();
+  }
+}, { passive: true });
 
 // ป้องกันการคลิกขวา / แคปภาพ / คัดลอก
 document.addEventListener("contextmenu", (e) => e.preventDefault());

@@ -164,6 +164,31 @@ body {
 /* คลังไฟล์ */
 .header-bar h1 { font-size: 22px; color: #7a5c43; }
 .header-bar p { color: #9e8a78; margin-top: 4px; margin-bottom: 20px; }
+
+/* ช่องค้นหาไฟล์ */
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 18px;
+  border: 2px solid #f0e6df;
+  border-radius: 16px;
+  font-family: 'Itim', cursive;
+  font-size: 15px;
+  outline: none;
+  background-color: #ffffff;
+  color: #4a3b32;
+  box-shadow: 0 4px 10px rgba(140, 109, 83, 0.04);
+  transition: 0.2s;
+}
+
+.search-box input:focus {
+  border-color: #cbb29d;
+  box-shadow: 0 4px 14px rgba(140, 109, 83, 0.1);
+}
+
 .file-grid { display: flex; flex-direction: column; gap: 15px; }
 
 .file-card {
@@ -182,7 +207,7 @@ body {
 .file-card p { color: #a08c7c; font-size: 13px; margin-top: 2px; }
 .btn-open { display: inline-block; margin-top: 10px; color: #b59a83; font-weight: bold; font-size: 14px; }
 
-/* สไตล์การ์ด Coming Soon */
+/* การ์ด Coming Soon */
 .coming-soon-card {
   border: 2px dashed #d6beaa !important;
   background-color: #fdfbf7 !important;

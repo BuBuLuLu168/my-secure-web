@@ -53,6 +53,11 @@
         <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#a67c52;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
       </div>
 
+      <!-- ช่องค้นหาไฟล์ -->
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="🔍 พิมพ์ชื่อวิชาเพื่อค้นหา..." oninput="filterFiles()">
+      </div>
+
       <div id="file-grid" class="file-grid"></div>
     </div>
 
