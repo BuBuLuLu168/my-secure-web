@@ -31,21 +31,24 @@ async function checkAccess() {
     return;
   }
 
+  // เข้าสู่ระบบสำเร็จ
   document.getElementById("login-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   document.getElementById("user-display-name").innerText = user;
   document.getElementById("watermark").innerText = `${user} - ${new Date().toLocaleTimeString()}`;
 
+  // โหลดรายการไฟล์ PDF ทั้งหมดอัตโนมัติ
   loadFileList();
 }
 
-// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase
+// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
   fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78;'>กำลังโหลดรายการไฟล์...</p>";
 
   const { data, error } = await _supabase.storage.from('pdf-files').list();
 
+  // กรณีในระบบยังไม่มีไฟล์ แสดงข้อความ Coming Soon
   if (error || !data || data.length === 0) {
     fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78; font-size:18px; padding:30px 0;'>⏳ ยังไม่มีรายการไฟล์ในขณะนี้ (Coming Soon...)</p>";
     return;
@@ -53,6 +56,7 @@ async function loadFileList() {
 
   fileGrid.innerHTML = "";
 
+  // วนลูปสร้างปุ่มไฟล์
   data.forEach((file) => {
     if (file.name.startsWith('.')) return;
 
@@ -65,14 +69,14 @@ async function loadFileList() {
     card.innerHTML = `
       <div class="card-icon">📄</div>
       <h3>${file.name.replace('.pdf', '')}</h3>
-      <p>ไฟล์ PDF เอกสาร</p>
+      <p>ไฟล์ PDF เอกสารเฉลย</p>
       <span class="btn-open">เปิดอ่านเนื้อหา →</span>
     `;
     fileGrid.appendChild(card);
   });
 }
 
-// ฟังก์ชันแสดง PDF ตรงบนหน้าเว็บ (ไม่เปิดใน Drive)
+// ฟังก์ชันเปิดดูไฟล์ PDF (เรนเดอร์ความละเอียดสูง HD คมชัดบนมือถือ)
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
@@ -90,12 +94,19 @@ async function openPdfViewer(fileName, fileUrl) {
     // วนลูปวาดเนื้อหา PDF ทุกหน้าลงบนหน้าเว็บ
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1.5 });
+      
+      // ปรับ Scale เป็น 2.5 เพื่อให้ภาพละเอียดสูง คมชัดบนจอมือถือ Retina / HD
+      const scale = 2.5;
+      const viewport = page.getViewport({ scale: scale });
 
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
+      
+      // กำหนดความละเอียดจริงของภาพ
       canvas.height = viewport.height;
       canvas.width = viewport.width;
+      
+      // แสดงผลพอดีหน้าจอมือถือโดยอัตโนมัติ
       canvas.style.width = "100%";
       canvas.style.height = "auto";
       canvas.style.marginBottom = "15px";
@@ -115,13 +126,14 @@ async function openPdfViewer(fileName, fileUrl) {
   }
 }
 
+// กดกลับไปหน้าเลือกไฟล์
 function backToDashboard() {
   document.getElementById("content-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   document.getElementById("pdf-container").innerHTML = "";
 }
 
-// ป้องกันการกดคัดลอก/คลิกขวา
+// ป้องกันการคลิกขวา / แคปภาพ / คัดลอก
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   if (e.key === "PrintScreen" || (e.ctrlKey && (e.key === "p" || e.key === "s")) || e.key === "F12") {
