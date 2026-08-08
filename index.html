@@ -3,45 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Key Space</title>
+  <title>KeySpace - คลังเฉลยข้อสอบ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  
+  <!-- ตัวแปลง PDF ป้องกันการเด้งเข้าแอป Drive -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
   <!-- 1. หน้าเข้าสู่ระบบ -->
   <div id="login-box">
     <div class="icon-header">🔑</div>
-    <h2>เข้าสู่ระบบดูเฉลย</h2>
+    <h2>เข้าสู่ระบบ</h2>
     <p class="subtitle">กรอกชื่อและรหัสผ่านเพื่อเข้าใช้งานนะ</p>
     
     <input type="text" id="username" placeholder="ชื่อผู้ใช้งานของคุณ">
-    <input type="password" id="access-code" placeholder="รหัสผ่านรหัสไฟล์">
+    <input type="password" id="access-code" placeholder="รหัสผ่าน">
     <button onclick="checkAccess()">เข้าสู่ระบบ ✨</button>
     
     <p id="error-msg" style="color: #e06d53; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
   </div>
 
-  <!-- 2. หน้าเลือกไฟล์ (ดึงมาจาก Supabase อัตโนมัติ) -->
+  <!-- 2. หน้าเลือกไฟล์ -->
   <div id="dashboard-box" style="display: none;">
     <div class="header-bar">
       <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
       <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#a67c52;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
     </div>
 
-    <!-- ตารางสร้างปุ่มไฟล์อัตโนมัติ -->
     <div id="file-grid" class="file-grid"></div>
   </div>
 
-  <!-- 3. หน้าอ่านเนื้อหาไฟล์ PDF -->
+  <!-- 3. หน้าอ่านเนื้อหาไฟล์ PDF (แสดงผ่าน Canvas) -->
   <div id="content-box" style="display: none;">
     <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
     <div class="topic-card">
-      <h2 id="pdf-title" style="color: #8c6d53;">ชื่อไฟล์</h2>
-      <!-- กรอบแสดง PDF -->
-      <iframe id="pdf-viewer" src="" width="100%" height="600px" style="border: none; border-radius: 12px;"></iframe>
+      <h2 id="pdf-title" style="color: #8c6d53; margin-bottom: 20px;">ชื่อไฟล์</h2>
+      <!-- พื้นที่วาด PDF ลงบนหน้าเว็บ -->
+      <div id="pdf-container" style="width: 100%; text-align: center;"></div>
     </div>
   </div>
 
