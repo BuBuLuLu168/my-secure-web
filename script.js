@@ -38,15 +38,16 @@ async function checkAccess() {
   loadFileList();
 }
 
-// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage มาสร้างเป็นปุ่มอัตโนมัติ
+// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
-  fileGrid.innerHTML = "<p>กำลังโหลดรายการไฟล์...</p>";
+  fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78;'>กำลังโหลดรายการไฟล์...</p>";
 
   const { data, error } = await _supabase.storage.from('pdf-files').list();
 
+  // กรณีในระบบยังไม่มีไฟล์ แสดงข้อความ Coming Soon
   if (error || !data || data.length === 0) {
-    fileGrid.innerHTML = "<p>ยังไม่มีไฟล์ในระบบ (ให้ลากไฟล์ใส่ใน Supabase ได้เลยครับ)</p>";
+    fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78; font-size:18px; padding:30px 0;'>⏳ ยังไม่มีรายการไฟล์ในขณะนี้ (Coming Soon...)</p>";
     return;
   }
 
@@ -54,10 +55,8 @@ async function loadFileList() {
 
   // วนลูปสร้างปุ่มไฟล์
   data.forEach((file) => {
-    // ข้ามไฟล์ซ่อน (.emptyFolderPlaceholder)
     if (file.name.startsWith('.')) return;
 
-    // สร้าง URL ตรงสำหรับเปิดไฟล์ PDF
     const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
 
     const card = document.createElement("div");
@@ -80,7 +79,6 @@ function openPdfViewer(fileName, fileUrl) {
   document.getElementById("content-box").style.display = "block";
   
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
-  // ฝัง PDF ดูบนเว็บ
   document.getElementById("pdf-viewer").src = fileUrl;
 }
 
@@ -88,7 +86,7 @@ function openPdfViewer(fileName, fileUrl) {
 function backToDashboard() {
   document.getElementById("content-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
-  document.getElementById("pdf-viewer").src = ""; // ล้าง PDF
+  document.getElementById("pdf-viewer").src = "";
 }
 
 // สคริปต์ป้องกันการแคป/ก็อปปี้
