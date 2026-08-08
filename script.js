@@ -70,7 +70,7 @@ async function checkAccess() {
 // ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
-  fileGrid.innerHTML = "<p style='text-align:center; color:#738A72;'>กำลังโหลดรายการไฟล์...</p>";
+  fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C;'>กำลังโหลดรายการไฟล์...</p>";
 
   const { data, error } = await _supabase.storage.from('pdf-files').list();
 
@@ -131,14 +131,14 @@ function filterFiles() {
   });
 }
 
-// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้ (โทนเขียวมัทฉะ)
+// ฟังก์ชันเปิดดูไฟล์ PDF + ฝังลายน้ำชื่อผู้ใช้ (โทนพีชละมุน)
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
 
   const container = document.getElementById("pdf-container");
-  container.innerHTML = "<p style='text-align:center; color:#738A72; font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
+  container.innerHTML = "<p style='text-align:center; color:#8E756C; font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
 
   try {
     const loadingTask = pdfjsLib.getDocument(fileUrl);
@@ -173,11 +173,11 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // วาดลายน้ำพาดเอียงฝังลง Canvas (สีเขียวจางๆ)
+      // วาดลายน้ำพาดเอียงฝังลง Canvas (สีพีชจางๆ)
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 32px 'Itim', sans-serif";
-      context.fillStyle = "rgba(88, 129, 87, 0.18)";
+      context.fillStyle = "rgba(226, 169, 155, 0.22)";
       context.rotate(-25 * Math.PI / 180);
 
       for (let y = -canvas.height; y < canvas.height * 2; y += 180) {

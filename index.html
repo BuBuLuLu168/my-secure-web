@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- ตั้งค่าชื่อเว็บและพรีวิวเวลาส่งลิงก์ -->
+  <!-- กำหนดชื่อและพรีวิวเวลาส่งลิงก์ใน LINE / Facebook -->
   <title>My KeySpace</title>
-  <meta name="description" content="My KeySpace">
+  <meta name="description" content="My KeySpace - คลังเฉลยเอกสาร">
   <meta property="og:title" content="My KeySpace">
   <meta property="og:site_name" content="My KeySpace">
-  <meta property="og:description" content="My KeySpace">
+  <meta property="og:description" content="My KeySpace - คลังเฉลยเอกสาร">
+  <meta property="og:type" content="website">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +21,7 @@
 </head>
 <body>
 
-  <!-- แถบ Navbar สีมัทฉะมินิมอล ชิดขอบบน -->
+  <!-- แถบ Navbar สีครีมพีชชิดขอบบน -->
   <nav class="navbar">
     <div class="nav-brand" onclick="location.reload()">🔑 My KeySpace</div>
     
@@ -57,7 +58,7 @@
     <div id="dashboard-box" style="display: none;">
       <div class="header-bar">
         <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
-        <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#588157;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
+        <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#d48c7c;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
       </div>
 
       <!-- ช่องค้นหาไฟล์ -->
@@ -72,7 +73,7 @@
     <div id="content-box" style="display: none;">
       <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
       <div class="topic-card">
-        <h2 id="pdf-title" style="color: #3A4D39; margin-bottom: 20px;">ชื่อไฟล์</h2>
+        <h2 id="pdf-title" style="color: #523a36; margin-bottom: 20px;">ชื่อไฟล์</h2>
         <div id="pdf-container" style="width: 100%; text-align: center; position: relative;"></div>
       </div>
     </div>

@@ -5,17 +5,17 @@
 }
 
 body {
-  background-color: #F4F7F4;
+  background-color: #FAF6F0;
   font-family: 'Itim', cursive, sans-serif;
-  color: #3A4D39;
+  color: #523A36;
   min-height: 100vh;
 }
 
-/* Navbar สไตล์มัทฉะลาเต้ */
+/* Navbar สไตล์ครีมพีชละมุน */
 .navbar {
   width: 100%;
   background-color: #ffffff;
-  border-bottom: 2px solid #E0E7E1;
+  border-bottom: 2px solid #F3E8E1;
   padding: 12px 20px;
   display: flex;
   justify-content: space-between;
@@ -23,13 +23,13 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(58, 77, 57, 0.05);
+  box-shadow: 0 2px 10px rgba(82, 58, 54, 0.04);
 }
 
 .nav-brand {
   font-size: 20px;
   font-weight: bold;
-  color: #3A4D39;
+  color: #523A36;
   cursor: pointer;
 }
 
@@ -40,25 +40,25 @@ body {
 }
 
 .badge-status {
-  background-color: #E8EFE9;
-  color: #3A4D39;
+  background-color: #F8ECE6;
+  color: #523A36;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: bold;
-  border: 1px solid #D0DDD2;
+  border: 1px solid #EAD8CE;
 }
 
 .badge-online {
-  background-color: #D8EAD9;
+  background-color: #E8F5E9;
   color: #2D5A27;
   border-color: #B2D8B0;
 }
 
 .menu-btn {
-  background: #E8EFE9;
-  border: 1px solid #C8D6CA;
-  color: #3A4D39;
+  background: #F8ECE6;
+  border: 1px solid #EAD8CE;
+  color: #523A36;
   font-size: 18px;
   padding: 5px 12px;
   border-radius: 12px;
@@ -67,7 +67,7 @@ body {
 }
 
 .menu-btn:hover {
-  background: #D8E2D9;
+  background: #F0DED3;
 }
 
 .dropdown-menu {
@@ -76,9 +76,9 @@ body {
   top: 60px;
   right: 20px;
   background-color: #ffffff;
-  border: 2px solid #E0E7E1;
+  border: 2px solid #F3E8E1;
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(58, 77, 57, 0.1);
+  box-shadow: 0 8px 20px rgba(82, 58, 54, 0.08);
   width: 180px;
   overflow: hidden;
   flex-direction: column;
@@ -97,16 +97,16 @@ body {
 
 .menu-item {
   padding: 12px 16px;
-  color: #3A4D39;
+  color: #523A36;
   text-decoration: none;
   font-size: 15px;
   cursor: pointer;
-  border-bottom: 1px solid #F0F4F0;
+  border-bottom: 1px solid #FAF0EA;
   transition: 0.2s;
 }
 
 .menu-item:last-child { border-bottom: none; }
-.menu-item:hover { background-color: #F4F7F4; color: #588157; }
+.menu-item:hover { background-color: #FCF4EF; color: #D48C7C; }
 .logout-item { color: #d9534f; }
 .logout-item:hover { background-color: #FDF2F2; }
 
@@ -121,34 +121,34 @@ body {
   background: #ffffff;
   padding: 35px 25px;
   border-radius: 24px;
-  box-shadow: 0 10px 25px rgba(58, 77, 57, 0.06);
+  box-shadow: 0 10px 25px rgba(82, 58, 54, 0.06);
   text-align: center;
-  border: 2px solid #E0E7E1;
+  border: 2px solid #F3E8E1;
 }
 
 .icon-header { font-size: 42px; margin-bottom: 10px; }
-#login-box h2 { color: #3A4D39; margin-bottom: 6px; }
-.subtitle { color: #738A72; font-size: 14px; margin-bottom: 22px; }
+#login-box h2 { color: #523A36; margin-bottom: 6px; }
+.subtitle { color: #8E756C; font-size: 14px; margin-bottom: 22px; }
 
 #login-box input {
   width: 100%;
   padding: 12px 16px;
   margin-bottom: 12px;
-  border: 2px solid #E0E7E1;
+  border: 2px solid #F3E8E1;
   border-radius: 14px;
   font-family: 'Itim', cursive;
   font-size: 15px;
   outline: none;
-  background-color: #F9FAF9;
-  color: #3A4D39;
+  background-color: #FCF9F5;
+  color: #523A36;
 }
 
-#login-box input:focus { border-color: #A3B18A; background-color: #ffffff; }
+#login-box input:focus { border-color: #E2A99B; background-color: #ffffff; }
 
 #login-box button {
   width: 100%;
   padding: 12px;
-  background-color: #A3B18A;
+  background-color: #E2A99B;
   color: #ffffff;
   border: none;
   border-radius: 14px;
@@ -159,11 +159,11 @@ body {
   font-weight: bold;
 }
 
-#login-box button:hover { background-color: #588157; }
+#login-box button:hover { background-color: #D49586; }
 
 /* คลังไฟล์ */
-.header-bar h1 { font-size: 22px; color: #3A4D39; }
-.header-bar p { color: #738A72; margin-top: 4px; margin-bottom: 20px; }
+.header-bar h1 { font-size: 22px; color: #523A36; }
+.header-bar p { color: #8E756C; margin-top: 4px; margin-bottom: 20px; }
 
 /* ช่องค้นหาไฟล์ */
 .search-box {
@@ -173,20 +173,20 @@ body {
 .search-box input {
   width: 100%;
   padding: 12px 18px;
-  border: 2px solid #E0E7E1;
+  border: 2px solid #F3E8E1;
   border-radius: 16px;
   font-family: 'Itim', cursive;
   font-size: 15px;
   outline: none;
   background-color: #ffffff;
-  color: #3A4D39;
-  box-shadow: 0 4px 10px rgba(58, 77, 57, 0.03);
+  color: #523A36;
+  box-shadow: 0 4px 10px rgba(82, 58, 54, 0.03);
   transition: 0.2s;
 }
 
 .search-box input:focus {
-  border-color: #A3B18A;
-  box-shadow: 0 4px 14px rgba(58, 77, 57, 0.08);
+  border-color: #E2A99B;
+  box-shadow: 0 4px 14px rgba(82, 58, 54, 0.08);
 }
 
 .file-grid { display: flex; flex-direction: column; gap: 15px; }
@@ -195,22 +195,22 @@ body {
   background: #ffffff;
   padding: 18px 20px;
   border-radius: 18px;
-  border: 2px solid #E0E7E1;
-  box-shadow: 0 4px 12px rgba(58, 77, 57, 0.04);
+  border: 2px solid #F3E8E1;
+  box-shadow: 0 4px 12px rgba(82, 58, 54, 0.04);
   cursor: pointer;
   transition: 0.2s;
 }
 
-.file-card:hover { transform: translateY(-2px); border-color: #A3B18A; }
+.file-card:hover { transform: translateY(-2px); border-color: #E2A99B; }
 .card-icon { font-size: 28px; margin-bottom: 6px; }
-.file-card h3 { color: #3A4D39; font-size: 18px; }
-.file-card p { color: #738A72; font-size: 13px; margin-top: 2px; }
-.btn-open { display: inline-block; margin-top: 10px; color: #588157; font-weight: bold; font-size: 14px; }
+.file-card h3 { color: #523A36; font-size: 18px; }
+.file-card p { color: #8E756C; font-size: 13px; margin-top: 2px; }
+.btn-open { display: inline-block; margin-top: 10px; color: #D48C7C; font-weight: bold; font-size: 14px; }
 
 /* การ์ด Coming Soon */
 .coming-soon-card {
-  border: 2px dashed #A3B18A !important;
-  background-color: #F8FAF8 !important;
+  border: 2px dashed #E2A99B !important;
+  background-color: #FCF9F5 !important;
   opacity: 0.85;
   cursor: default !important;
 }
@@ -218,9 +218,9 @@ body {
 
 /* หน้าอ่าน PDF */
 .btn-back {
-  background: #E8EFE9;
-  color: #3A4D39;
-  border: 1px solid #C8D6CA;
+  background: #F8ECE6;
+  color: #523A36;
+  border: 1px solid #EAD8CE;
   padding: 8px 16px;
   border-radius: 12px;
   font-family: 'Itim', cursive;
@@ -233,5 +233,5 @@ body {
   background: #ffffff;
   padding: 20px;
   border-radius: 20px;
-  border: 2px solid #E0E7E1;
+  border: 2px solid #F3E8E1;
 }
