@@ -3,27 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบเข้าชมไฟล์ปลอดภัย</title>
+  <title>คลังไฟล์ปลอดภัย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- หน้าเข้าสู่ระบบ -->
+  <!-- 1. หน้าเข้าสู่ระบบ -->
   <div id="login-box">
-    <h2>กรุณาใส่ข้อมูลเพื่อเข้าดูไฟล์</h2>
+    <div class="icon-header">🔑</div>
+    <h2>เข้าสู่ระบบดูเฉลย</h2>
+    <p class="subtitle">กรอกชื่อและรหัสผ่านเพื่อเข้าใช้งานนะ</p>
+    
     <input type="text" id="username" placeholder="ชื่อผู้ใช้งานของคุณ">
     <input type="password" id="access-code" placeholder="รหัสผ่านรหัสไฟล์">
-    <button onclick="checkAccess()">เข้าสู่ระบบ</button>
-    <p id="error-msg" style="color: red; display: none;">รหัสไม่ถูกต้อง!</p>
+    <button onclick="checkAccess()">เข้าสู่ระบบ ✨</button>
+    
+    <p id="error-msg" style="color: #e06d53; display: none; margin-top: 10px;">รหัสไม่ถูกต้องน้า ลองใหม่อีกที!</p>
   </div>
 
-  <!-- หน้าแสดงเนื้อหา (ซ่อนไว้ก่อน) -->
+  <!-- 2. หน้าเลือกไฟล์ (ดึงมาจาก Supabase อัตโนมัติ) -->
+  <div id="dashboard-box" style="display: none;">
+    <div class="header-bar">
+      <h1>📂 เลือกไฟล์ที่ต้องการอ่าน</h1>
+      <p>ยินดีต้อนรับคุณ <span id="user-display-name" style="color:#a67c52;"></span> เลือกวิชาด้านล่างได้เลยจ้า</p>
+    </div>
+
+    <!-- ตารางสร้างปุ่มไฟล์อัตโนมัติ -->
+    <div id="file-grid" class="file-grid"></div>
+  </div>
+
+  <!-- 3. หน้าอ่านเนื้อหาไฟล์ PDF -->
   <div id="content-box" style="display: none;">
-    <h1>ยินดีต้อนรับ! นี่คือไฟล์ของคุณ</h1>
-    <p>เนื้อหาความลับตรงนี้จะไม่สามารถแคปจอหรือกดพิมพ์ได้...</p>
+    <button class="btn-back" onclick="backToDashboard()">← กลับไปเลือกไฟล์อื่น</button>
+    <div class="topic-card">
+      <h2 id="pdf-title" style="color: #8c6d53;">ชื่อไฟล์</h2>
+      <!-- กรอบแสดง PDF -->
+      <iframe id="pdf-viewer" src="" width="100%" height="600px" style="border: none; border-radius: 12px;"></iframe>
+    </div>
   </div>
 
-  <!-- ลายน้ำป้องกันถ่ายรูป -->
+  <!-- ลายน้ำ -->
   <div id="watermark"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

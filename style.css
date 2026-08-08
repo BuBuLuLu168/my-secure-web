@@ -1,31 +1,188 @@
-body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f4f4f9;
-  user-select: none; /* ห้ามลากคลุมดำข้อความ */
+* {
+  box-sizing: border-box;
+  font-family: 'Itim', cursive, sans-serif; /* ใช้ฟอนต์ Itim ทั้งเว็บ */
 }
 
-#login-box, #content-box {
-  background: white;
+body {
+  margin: 0;
+  padding: 20px;
+  background-color: #faf6f0; /* สีพื้นหลังครีมอ่อนละมุน */
+  color: #5c4b43; /* สีตัวอักษรน้ำตาลอุ่น */
+  user-select: none;
+}
+
+/* กล่องเข้าสู่ระบบ */
+#login-box {
+  max-width: 380px;
+  margin: 60px auto;
+  background: #ffffff;
   padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 24px;
+  border: 2px solid #f0e5d8;
+  box-shadow: 0 10px 25px rgba(166, 124, 82, 0.08);
   text-align: center;
 }
 
-input, button {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  box-sizing: border-box;
+.icon-header {
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 
-/* ลายน้ำพาดจอ */
+#login-box h2 {
+  margin: 0;
+  color: #8c6d53;
+  font-size: 24px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #9e8a78;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border: 2px solid #f2e9e1;
+  background-color: #faf6f0;
+  border-radius: 14px;
+  font-size: 16px;
+  color: #5c4b43;
+  outline: none;
+}
+
+input:focus {
+  border-color: #d8c2b0;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: #d8c2b0; /* ปุ่มสีครีมนมเย็น/น้ำตาลอ่อน */
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background-color: #c4a994;
+}
+
+/* หน้าแดชบอร์ดหลัก (เลือกไฟล์) */
+#dashboard-box, #content-box {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-bar {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 20px;
+  border: 2px solid #f0e5d8;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.header-bar h1 {
+  margin: 0;
+  color: #8c6d53;
+}
+
+/* การ์ดเลือกไฟล์แบบ Grid */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.file-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 20px;
+  border: 2px solid #f0e5d8;
+  box-shadow: 0 6px 15px rgba(166, 124, 82, 0.05);
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+  text-align: center;
+}
+
+.file-card:hover {
+  transform: translateY(-5px);
+  border-color: #c4a994;
+}
+
+.file-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.card-icon {
+  font-size: 45px;
+  margin-bottom: 10px;
+}
+
+.file-card h3 {
+  margin: 5px 0;
+  color: #8c6d53;
+}
+
+.file-card p {
+  color: #9e8a78;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.btn-open {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #f5ebe0;
+  color: #8c6d53;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* ปุ่มกดกลับ */
+.btn-back {
+  width: auto;
+  padding: 8px 20px;
+  margin-bottom: 20px;
+  background: #e6ccb2;
+}
+
+/* กล่องเนื้อหา */
+.topic-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  border: 2px solid #f0e5d8;
+}
+
+.qa-item {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #f0e5d8;
+}
+
+.q {
+  font-weight: bold;
+  color: #5c4b43;
+}
+
+.a {
+  color: #4f772d;
+  background: #f0f3e8;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+/* ลายน้ำ */
 #watermark {
   position: fixed;
   top: 0;
@@ -33,9 +190,9 @@ input, button {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  opacity: 0.15;
-  font-size: 24px;
-  color: red;
+  opacity: 0.10;
+  font-size: 26px;
+  color: #e06d53;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
@@ -43,7 +200,4 @@ input, button {
   z-index: 9999;
 }
 
-/* ซ่อนเนื้อหาเมื่อกดพิมพ์ (Print Screen/Save PDF) */
-@media print {
-  body { display: none !important; }
-}
+@media print { body { display: none !important; } }
