@@ -32,9 +32,14 @@ async function checkAccess() {
   }
 
   // เข้าสู่ระบบสำเร็จ
+  errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
+  document.getElementById("main-nav").style.display = "flex"; // แสดง Navbar ด้านบน
   document.getElementById("dashboard-box").style.display = "block";
+  
+  // แสดงชื่อผู้ใช้ใน Navbar และ Dashboard
   document.getElementById("user-display-name").innerText = user;
+  document.getElementById("nav-username").innerText = user;
   document.getElementById("watermark").innerText = `${user} - ${new Date().toLocaleTimeString()}`;
 
   // โหลดรายการไฟล์ PDF ทั้งหมดอัตโนมัติ
@@ -130,6 +135,19 @@ function backToDashboard() {
   document.getElementById("pdf-container").innerHTML = "";
 }
 
+// ฟังก์ชันออกจากระบบ (Logout)
+function logout() {
+  document.getElementById("main-nav").style.display = "none";
+  document.getElementById("dashboard-box").style.display = "none";
+  document.getElementById("content-box").style.display = "none";
+  document.getElementById("login-box").style.display = "block";
+  
+  // ล้างค่าข้อมูล
+  document.getElementById("username").value = "";
+  document.getElementById("access-code").value = "";
+  document.getElementById("pdf-container").innerHTML = "";
+}
+
 // ------------------------------------
 // ระบบ Pull-to-Refresh (ดึงหน้าจอลงเพื่อโหลดไฟล์ใหม่)
 // ------------------------------------
@@ -143,11 +161,9 @@ window.addEventListener('touchstart', (e) => {
 window.addEventListener('touchend', (e) => {
   touchEndY = e.changedTouches[0].clientY;
   
-  // เช็กว่าอยู่หน้า dashboard และอยู่บนสุดของหน้าจอ
   const isDashboardVisible = document.getElementById("dashboard-box").style.display !== "none";
   const isAtTop = window.scrollY === 0;
 
-  // ถ้าดึงลงมามากกว่า 100px และอยู่จุดบนสุด ให้รีโหลดรายการไฟล์
   if (isDashboardVisible && isAtTop && (touchEndY - touchStartY > 100)) {
     loadFileList();
   }

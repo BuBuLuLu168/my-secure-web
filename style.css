@@ -201,3 +201,51 @@ button:hover {
 }
 
 @media print { body { display: none !important; } }
+/* แท็บด้านบน */
+.top-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 12px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid #f3ece4;
+}
+
+.nav-brand {
+  font-size: 20px;
+  font-weight: bold;
+  color: #8c6d53;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-badge {
+  background-color: #f7f3ee;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #73573f;
+}
+
+.btn-logout {
+  background-color: #f2a490;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-family: 'Itim', cursive;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: #e06d53;
+}
