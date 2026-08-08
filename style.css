@@ -11,7 +11,7 @@ body {
   min-height: 100vh;
 }
 
-/* Navbar สีครีมน่ารัก ชิดขอบบน */
+/* Navbar ชิดขอบบน */
 .navbar {
   width: 100%;
   background-color: #ffffff;
@@ -70,7 +70,6 @@ body {
   background: #ebd8ce;
 }
 
-/* Dropdown Menu สีครีมนุ่มนวล เลื่อนลงมาจากมุมขวา */
 .dropdown-menu {
   display: none;
   position: absolute;
@@ -92,14 +91,8 @@ body {
 }
 
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .menu-item {
@@ -112,31 +105,18 @@ body {
   transition: 0.2s;
 }
 
-.menu-item:last-child {
-  border-bottom: none;
-}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:hover { background-color: #fcf4ec; color: #8c6d53; }
+.logout-item { color: #d9534f; }
+.logout-item:hover { background-color: #fdf2f2; }
 
-.menu-item:hover {
-  background-color: #fcf4ec;
-  color: #8c6d53;
-}
-
-.logout-item {
-  color: #d9534f;
-}
-
-.logout-item:hover {
-  background-color: #fdf2f2;
-}
-
-/* กล่องเนื้อหาหลัก */
 .main-container {
   padding: 30px 20px;
   max-width: 500px;
   margin: 0 auto;
 }
 
-/* หน้าเข้าสู่ระบบน่ารักโทนอบอุ่น */
+/* หน้าเข้าสู่ระบบ */
 #login-box {
   background: #ffffff;
   padding: 35px 25px;
@@ -146,21 +126,9 @@ body {
   border: 2px solid #f3ece4;
 }
 
-.icon-header {
-  font-size: 42px;
-  margin-bottom: 10px;
-}
-
-#login-box h2 {
-  color: #7a5c43;
-  margin-bottom: 6px;
-}
-
-.subtitle {
-  color: #9e8a78;
-  font-size: 14px;
-  margin-bottom: 22px;
-}
+.icon-header { font-size: 42px; margin-bottom: 10px; }
+#login-box h2 { color: #7a5c43; margin-bottom: 6px; }
+.subtitle { color: #9e8a78; font-size: 14px; margin-bottom: 22px; }
 
 #login-box input {
   width: 100%;
@@ -175,10 +143,7 @@ body {
   color: #4a3b32;
 }
 
-#login-box input:focus {
-  border-color: #cbb29d;
-  background-color: #ffffff;
-}
+#login-box input:focus { border-color: #cbb29d; background-color: #ffffff; }
 
 #login-box button {
   width: 100%;
@@ -194,27 +159,12 @@ body {
   font-weight: bold;
 }
 
-#login-box button:hover {
-  background-color: #b59a83;
-}
+#login-box button:hover { background-color: #b59a83; }
 
 /* คลังไฟล์ */
-.header-bar h1 {
-  font-size: 22px;
-  color: #7a5c43;
-}
-
-.header-bar p {
-  color: #9e8a78;
-  margin-top: 4px;
-  margin-bottom: 20px;
-}
-
-.file-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+.header-bar h1 { font-size: 22px; color: #7a5c43; }
+.header-bar p { color: #9e8a78; margin-top: 4px; margin-bottom: 20px; }
+.file-grid { display: flex; flex-direction: column; gap: 15px; }
 
 .file-card {
   background: #ffffff;
@@ -226,34 +176,20 @@ body {
   transition: 0.2s;
 }
 
-.file-card:hover {
-  transform: translateY(-2px);
-  border-color: #d6beaa;
-}
+.file-card:hover { transform: translateY(-2px); border-color: #d6beaa; }
+.card-icon { font-size: 28px; margin-bottom: 6px; }
+.file-card h3 { color: #6e5038; font-size: 18px; }
+.file-card p { color: #a08c7c; font-size: 13px; margin-top: 2px; }
+.btn-open { display: inline-block; margin-top: 10px; color: #b59a83; font-weight: bold; font-size: 14px; }
 
-.card-icon {
-  font-size: 28px;
-  margin-bottom: 6px;
+/* สไตล์การ์ด Coming Soon */
+.coming-soon-card {
+  border: 2px dashed #d6beaa !important;
+  background-color: #fdfbf7 !important;
+  opacity: 0.8;
+  cursor: default !important;
 }
-
-.file-card h3 {
-  color: #6e5038;
-  font-size: 18px;
-}
-
-.file-card p {
-  color: #a08c7c;
-  font-size: 13px;
-  margin-top: 2px;
-}
-
-.btn-open {
-  display: inline-block;
-  margin-top: 10px;
-  color: #b59a83;
-  font-weight: bold;
-  font-size: 14px;
-}
+.coming-soon-card:hover { transform: none !important; }
 
 /* หน้าอ่าน PDF */
 .btn-back {
@@ -273,13 +209,4 @@ body {
   padding: 20px;
   border-radius: 20px;
   border: 2px solid #f0e6df;
-}
-
-#watermark {
-  position: fixed;
-  bottom: 10px;
-  right: 15px;
-  font-size: 12px;
-  color: rgba(120, 90, 70, 0.3);
-  pointer-events: none;
 }

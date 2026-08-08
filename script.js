@@ -4,16 +4,15 @@ const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ตั้งค่าตัวแปลง PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// เปิด / ปิด เมนูดรอปดาวน์ขีดสามขีด
+let currentLoggedInUser = "";
+
 function toggleMenu() {
   const menu = document.getElementById("dropdown-menu");
   menu.classList.toggle("show");
 }
 
-// ปิดเมนูอัตโนมัติเมื่อกดคลิกที่อื่น
 window.addEventListener("click", (e) => {
   if (!e.target.matches('.menu-btn')) {
     const menu = document.getElementById("dropdown-menu");
@@ -23,12 +22,10 @@ window.addEventListener("click", (e) => {
   }
 });
 
-// แสดงแจ้งเตือนกฎการใช้งาน
 function showRules() {
   alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
 }
 
-// เช็กรหัสผ่านเข้าสู่ระบบ
 async function checkAccess() {
   const user = document.getElementById("username").value.trim();
   const code = document.getElementById("access-code").value.trim();
@@ -52,58 +49,59 @@ async function checkAccess() {
     return;
   }
 
-  // เข้าสู่ระบบสำเร็จ
+  currentLoggedInUser = user;
   errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   
-  // อัปเดตป้ายสถานะปุ่ม Navbar และแสดงเมนูล็อกเอาต์
   const statusBadge = document.getElementById("status-badge");
   statusBadge.className = "badge-status badge-online";
   statusBadge.innerText = `👤 ${user}`;
   document.getElementById("menu-logout").style.display = "block";
-
-  // แสดงชื่อผู้ใช้ในหน้าคลังไฟล์ และตั้งค่าลายน้ำ
   document.getElementById("user-display-name").innerText = user;
-  document.getElementById("watermark").innerText = `${user} - ${new Date().toLocaleTimeString()}`;
 
   loadFileList();
 }
 
-// ฟังก์ชันดึงไฟล์ทั้งหมดจาก Supabase Storage
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
   fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78;'>กำลังโหลดรายการไฟล์...</p>";
 
   const { data, error } = await _supabase.storage.from('pdf-files').list();
 
-  if (error || !data || data.length === 0) {
-    fileGrid.innerHTML = "<p style='text-align:center; color:#9e8a78; font-size:18px; padding:30px 0;'>⏳ ยังไม่มีรายการไฟล์ในขณะนี้ (Coming Soon...)</p>";
-    return;
-  }
-
   fileGrid.innerHTML = "";
 
-  data.forEach((file) => {
-    if (file.name.startsWith('.')) return;
+  if (data && data.length > 0) {
+    data.forEach((file) => {
+      if (file.name.startsWith('.')) return;
 
-    const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
+      const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
 
-    const card = document.createElement("div");
-    card.className = "file-card";
-    card.onclick = () => openPdfViewer(file.name, fileUrl);
+      const card = document.createElement("div");
+      card.className = "file-card";
+      card.onclick = () => openPdfViewer(file.name, fileUrl);
 
-    card.innerHTML = `
-      <div class="card-icon">📄</div>
-      <h3>${file.name.replace('.pdf', '')}</h3>
-      <p>ไฟล์ PDF เอกสารเฉลย</p>
-      <span class="btn-open">เปิดอ่านเนื้อหา →</span>
-    `;
-    fileGrid.appendChild(card);
-  });
+      card.innerHTML = `
+        <div class="card-icon">📄</div>
+        <h3>${file.name.replace('.pdf', '')}</h3>
+        <p>ไฟล์ PDF เอกสารเฉลย</p>
+        <span class="btn-open">เปิดอ่านเนื้อหา →</span>
+      `;
+      fileGrid.appendChild(card);
+    });
+  }
+
+  // เพิ่มการ์ด Coming Soon ต่อท้ายรายการเสมอ
+  const comingSoonCard = document.createElement("div");
+  comingSoonCard.className = "file-card coming-soon-card";
+  comingSoonCard.innerHTML = `
+    <div class="card-icon">⏳</div>
+    <h3>Coming soon...</h3>
+    <p>กำลังเตรียมไฟล์เฉลยใหม่ๆ เร็วๆ นี้จ้า</p>
+  `;
+  fileGrid.appendChild(comingSoonCard);
 }
 
-// ฟังก์ชันเปิดดูไฟล์ PDF ความละเอียดสูง
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
@@ -142,21 +140,34 @@ async function openPdfViewer(fileName, fileUrl) {
         canvasContext: context,
         viewport: viewport
       };
+      
       await page.render(renderContext).promise;
+
+      // --- วาดลายน้ำพาดเอียงฝังลงไปในเนื้อหา Canvas ---
+      const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
+      context.save();
+      context.font = "bold 32px 'Itim', sans-serif";
+      context.fillStyle = "rgba(180, 140, 110, 0.22)"; // ลายน้ำสีน้ำตาลอ่อน จางๆ ไม่กวนตา
+      context.rotate(-25 * Math.PI / 180);
+
+      for (let y = -canvas.height; y < canvas.height * 2; y += 180) {
+        for (let x = -canvas.width; x < canvas.width * 2; x += 320) {
+          context.fillText(watermarkText, x, y);
+        }
+      }
+      context.restore();
     }
   } catch (error) {
     container.innerHTML = "<p style='color:#e06d53;'>ไม่สามารถเปิดไฟล์นี้ได้ กรุณาลองใหม่อีกครั้ง</p>";
   }
 }
 
-// กดกลับไปหน้าเลือกไฟล์
 function backToDashboard() {
   document.getElementById("content-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   document.getElementById("pdf-container").innerHTML = "";
 }
 
-// ฟังก์ชันออกจากระบบ
 function logout() {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "none";
@@ -171,25 +182,6 @@ function logout() {
   document.getElementById("access-code").value = "";
   document.getElementById("pdf-container").innerHTML = "";
 }
-
-// ระบบ Pull-to-Refresh
-let touchStartY = 0;
-let touchEndY = 0;
-
-window.addEventListener('touchstart', (e) => {
-  touchStartY = e.touches[0].clientY;
-}, { passive: true });
-
-window.addEventListener('touchend', (e) => {
-  touchEndY = e.changedTouches[0].clientY;
-  
-  const isDashboardVisible = document.getElementById("dashboard-box").style.display !== "none";
-  const isAtTop = window.scrollY === 0;
-
-  if (isDashboardVisible && isAtTop && (touchEndY - touchStartY > 100)) {
-    loadFileList();
-  }
-}, { passive: true });
 
 // ป้องกันการคลิกขวา / แคปภาพ / คัดลอก
 document.addEventListener("contextmenu", (e) => e.preventDefault());
