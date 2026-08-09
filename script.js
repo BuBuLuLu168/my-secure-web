@@ -23,10 +23,10 @@ function initTheme() {
 
   if (savedTheme === "dark") {
     document.body.classList.add("dark-mode");
-    if (themeBtn) themeBtn.innerText = "☀️ โหมดสว่าง";
+    if (themeBtn) themeBtn.innerText = "☀️";
   } else {
     document.body.classList.remove("dark-mode");
-    if (themeBtn) themeBtn.innerText = "🌙 โหมดมืด";
+    if (themeBtn) themeBtn.innerText = "🌙";
   }
 }
 
@@ -36,10 +36,10 @@ function toggleTheme() {
 
   if (isDark) {
     localStorage.setItem("user_theme", "dark");
-    if (themeBtn) themeBtn.innerText = "☀️ โหมดสว่าง";
+    if (themeBtn) themeBtn.innerText = "☀️";
   } else {
     localStorage.setItem("user_theme", "light");
-    if (themeBtn) themeBtn.innerText = "🌙 โหมดมืด";
+    if (themeBtn) themeBtn.innerText = "🌙";
   }
 }
 
