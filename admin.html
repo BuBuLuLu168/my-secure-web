@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* ธีมสว่าง (Light Mode ตั้งต้น) */
     :root {
       --primary: #E2A99B;
       --primary-dark: #C88675;
@@ -15,8 +16,23 @@
       --text-color: #4A3E3D;
       --sub-text: #8E756C;
       --border: #E8DFD8;
-      --success: #28a745;
-      --danger: #dc3545;
+      --input-bg: #FFFFFF;
+      --item-bg: #FFFBF9;
+      --item-hover: #FFF5F2;
+      --table-th: #F8F4F0;
+    }
+
+    /* ธีมมืด (Dark Mode) */
+    body.dark-mode {
+      --bg-color: #121212;
+      --card-bg: #1E1E1E;
+      --text-color: #E0E0E0;
+      --sub-text: #A0A0A0;
+      --border: #333333;
+      --input-bg: #2C2C2C;
+      --item-bg: #252525;
+      --item-hover: #352B28;
+      --table-th: #2A2A2A;
     }
 
     * {
@@ -24,6 +40,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Prompt', 'Itim', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
     }
 
     body {
@@ -37,6 +54,33 @@
     .container {
       width: 100%;
       max-width: 680px;
+      position: relative;
+    }
+
+    /* ปุ่มสลับโหมด มืด/สว่าง */
+    .theme-toggle-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .btn-theme {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-theme:hover {
+      border-color: var(--primary);
     }
 
     .header-card {
@@ -91,8 +135,8 @@
       border-radius: 10px;
       font-size: 14px;
       outline: none;
-      background: #FFF;
-      transition: all 0.2s;
+      background: var(--input-bg);
+      color: var(--text-color);
     }
 
     input:focus, select:focus {
@@ -110,7 +154,6 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     .btn:hover {
@@ -157,13 +200,13 @@
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: #FFFBF9;
+      background: var(--item-bg);
       cursor: pointer;
     }
 
     .checkbox-item:hover {
       border-color: var(--primary);
-      background: #FFF5F2;
+      background: var(--item-hover);
     }
 
     .checkbox-item input[type="checkbox"] {
@@ -195,7 +238,7 @@
     }
 
     th {
-      background: #F8F4F0;
+      background: var(--table-th);
       color: var(--sub-text);
       font-weight: 600;
     }
@@ -213,13 +256,18 @@
       display: none;
     }
 
-    .status-success { background: #d4edda; color: #155724; }
-    .status-error { background: #f8d7da; color: #721c24; }
+    .status-success { background: #1b4327; color: #d4edda; }
+    .status-error { background: #491217; color: #f8d7da; }
   </style>
 </head>
 <body>
 
   <div class="container">
+
+    <!-- ปุ่มสลับธีม -->
+    <div class="theme-toggle-container">
+      <button class="btn-theme" id="theme-btn" onclick="toggleTheme()">🌙 โหมดมืด</button>
+    </div>
     
     <!-- Header -->
     <div class="header-card">
@@ -272,8 +320,8 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <label style="font-size: 13px; font-weight: 600;">เลือกไฟล์ที่สิทธิ์อ่านได้ (<span id="file-count">0</span>):</label>
           <div>
-            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer;" onclick="selectAllFiles(true)">เลือกทั้งหมด</button>
-            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer;" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
+            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border); background: var(--item-bg); color: var(--text-color);" onclick="selectAllFiles(true)">เลือกทั้งหมด</button>
+            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border); background: var(--item-bg); color: var(--text-color);" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
           </div>
         </div>
 
@@ -313,11 +361,40 @@
     const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // สามารถเปลี่ยนรหัส Admin PIN ได้ตรงนี้
-    const ADMIN_PIN = "2537";
+    const ADMIN_PIN = "1234"; // รหัสผ่านเข้าหน้า Admin
 
     let allFiles = [];
     let selectedUser = "";
+
+    // --- ระบบเปลี่ยนธีม มืด/สว่าง ---
+    function initTheme() {
+      const savedTheme = localStorage.getItem("admin_theme");
+      const themeBtn = document.getElementById("theme-btn");
+
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        themeBtn.innerText = "☀️ โหมดสว่าง";
+      } else {
+        document.body.classList.remove("dark-mode");
+        themeBtn.innerText = "🌙 โหมดมืด";
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle("dark-mode");
+      const themeBtn = document.getElementById("theme-btn");
+
+      if (isDark) {
+        localStorage.setItem("admin_theme", "dark");
+        themeBtn.innerText = "☀️ โหมดสว่าง";
+      } else {
+        localStorage.setItem("admin_theme", "light");
+        themeBtn.innerText = "🌙 โหมดมืด";
+      }
+    }
+
+    // เรียกทำงานเรื่องธีมทันทีที่โหลดหน้า
+    initTheme();
 
     function unlockAdmin() {
       const inputPin = document.getElementById("admin-pin").value;
@@ -337,7 +414,6 @@
       await fetchAllFiles();
     }
 
-    // 1. เพิ่มผู้ใช้ใหม่ลงฐานข้อมูล (user_access_codes)
     async function createNewUser() {
       const usernameInput = document.getElementById("new-username").value.trim();
       const passcodeInput = document.getElementById("new-passcode").value.trim();
@@ -351,8 +427,8 @@
       }
 
       statusBox.className = "status-msg";
-      statusBox.style.background = "#fff3cd";
-      statusBox.style.color = "#856404";
+      statusBox.style.background = "#856404";
+      statusBox.style.color = "#fff3cd";
       statusBox.innerText = "⏳ กำลังบันทึกข้อมูล...";
       statusBox.style.display = "block";
 
@@ -362,23 +438,20 @@
 
       if (error) {
         statusBox.className = "status-msg status-error";
-        statusBox.innerText = "❌ เพิ่มไม่สำเร็จ (อาจมี Username นี้อยู่แล้ว): " + error.message;
+        statusBox.innerText = "❌ เพิ่มไม่สำเร็จ: " + error.message;
       } else {
         statusBox.className = "status-msg status-success";
         statusBox.innerText = `✅ เพิ่มลูกค้า "${usernameInput}" สำเร็จแล้ว!`;
         
-        // เคลียร์ช่องป้อนข้อมูล
         document.getElementById("new-username").value = "";
         document.getElementById("new-passcode").value = "";
 
-        // โหลดรายชื่อผู้ใช้ใหม่ และเลือกชื่อผู้ใช้นี้อัตโนมัติเพื่อให้ติ๊กสิทธิ์ต่อได้ทันที
         await fetchUsersList();
         document.getElementById("user-select").value = usernameInput;
         onUserSelected();
       }
     }
 
-    // 2. ดึงรายชื่อผู้ใช้ทั้งหมด
     async function fetchUsersList() {
       const userSelect = document.getElementById("user-select");
       const tableBody = document.getElementById("user-table-body");
@@ -394,17 +467,15 @@
         return;
       }
 
-      // ใส่ลง Dropdown
       userSelect.innerHTML = `<option value="">-- เลือกชื่อผู้ใช้จากระบบ --</option>` + 
         users.map(u => `<option value="${u.username}">${u.username}</option>`).join('');
 
-      // ใส่ลง ตารางแสดงรายชื่อ & รหัสผ่าน
       tableBody.innerHTML = users.map(u => `
         <tr>
           <td><b>${u.username}</b></td>
           <td><code>${u.access_code}</code></td>
           <td>
-            <button style="padding: 2px 8px; font-size:11px; cursor:pointer;" onclick="selectUserFromTable('${u.username}')">จัดการสิทธิ์</button>
+            <button style="padding: 2px 8px; font-size:11px; cursor:pointer; border-radius:4px; border:1px solid var(--border); background:var(--item-bg); color:var(--text-color);" onclick="selectUserFromTable('${u.username}')">จัดการสิทธิ์</button>
           </td>
         </tr>
       `).join('');
@@ -416,7 +487,6 @@
       window.scrollTo({ top: 300, behavior: 'smooth' });
     }
 
-    // 3. ดึงไฟล์ทั้งหมดใน Storage
     async function fetchAllFiles() {
       const container = document.getElementById("file-checkbox-container");
       
@@ -481,7 +551,6 @@
       checkboxes.forEach(chk => chk.checked = shouldSelect);
     }
 
-    // 4. บันทึกสิทธิ์ลงตาราง user_permissions
     async function savePermissions() {
       const statusBox = document.getElementById("save-status");
       statusBox.style.display = "none";
@@ -497,8 +566,8 @@
       const selectedFiles = Array.from(checkedBoxes).map(chk => chk.value);
 
       statusBox.className = "status-msg";
-      statusBox.style.background = "#fff3cd";
-      statusBox.style.color = "#856404";
+      statusBox.style.background = "#856404";
+      statusBox.style.color = "#fff3cd";
       statusBox.innerText = "⏳ กำลังบันทึกข้อมูลสิทธิ์...";
       statusBox.style.display = "block";
 
