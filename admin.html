@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบจัดการสิทธิ์ผู้ใช้งาน (Admin Panel) - My KeySpace</title>
+  <title>ระบบจัดการหลังบ้าน (Admin Panel) - My KeySpace</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -16,6 +16,7 @@
       --sub-text: #8E756C;
       --border: #E8DFD8;
       --success: #28a745;
+      --danger: #dc3545;
     }
 
     * {
@@ -35,13 +36,13 @@
 
     .container {
       width: 100%;
-      max-width: 650px;
+      max-width: 680px;
     }
 
     .header-card {
       background: var(--card-bg);
       border-radius: 16px;
-      padding: 24px;
+      padding: 20px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border);
       text-align: center;
@@ -51,26 +52,27 @@
     .header-card h1 {
       font-size: 22px;
       color: var(--primary-dark);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .header-card p {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--sub-text);
     }
 
-    /* Admin PIN Overlay */
+    /* Admin PIN Box */
     #pin-box {
       background: var(--card-bg);
-      padding: 20px;
+      padding: 24px;
       border-radius: 16px;
       border: 1px solid var(--border);
       text-align: center;
       margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
     .input-group {
-      margin-bottom: 15px;
+      margin-bottom: 14px;
       text-align: left;
     }
 
@@ -84,10 +86,10 @@
 
     input, select {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 14px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 14px;
       outline: none;
       background: #FFF;
       transition: all 0.2s;
@@ -105,7 +107,7 @@
       color: white;
       border: none;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
@@ -115,16 +117,7 @@
       background: var(--primary-dark);
     }
 
-    .btn-secondary {
-      background: #8E756C;
-      margin-top: 8px;
-    }
-
-    .btn-secondary:hover {
-      background: #6c5850;
-    }
-
-    /* Admin Panel Main Content */
+    /* Admin Content */
     #admin-content {
       display: none;
     }
@@ -138,46 +131,34 @@
       margin-bottom: 20px;
     }
 
-    .quick-actions {
+    .panel-card h2 {
+      font-size: 17px;
+      color: var(--primary-dark);
+      margin-bottom: 14px;
       display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+      align-items: center;
+      gap: 8px;
     }
 
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 13px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: #f8f5f2;
-      color: var(--text-color);
-    }
-
-    .btn-sm:hover {
-      background: var(--border);
-    }
-
-    /* Checklist Grid */
+    /* Checkbox list */
     .file-checkbox-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 350px;
+      gap: 8px;
+      max-height: 280px;
       overflow-y: auto;
       padding-right: 5px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .checkbox-item {
       display: flex;
       align-items: center;
-      padding: 12px;
+      padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 10px;
       background: #FFFBF9;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
     .checkbox-item:hover {
@@ -186,45 +167,54 @@
     }
 
     .checkbox-item input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin-right: 12px;
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
       cursor: pointer;
       accent-color: var(--primary-dark);
     }
 
-    .checkbox-item span {
-      font-size: 15px;
-      font-weight: 500;
+    /* Table for Users */
+    .user-table-wrapper {
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #F8F4F0;
+      color: var(--sub-text);
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
     }
 
     .status-msg {
       padding: 10px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       text-align: center;
       margin-top: 10px;
       display: none;
     }
 
-    .status-success {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-error {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .badge-count {
-      background: var(--primary-dark);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      margin-left: 6px;
-    }
+    .status-success { background: #d4edda; color: #155724; }
+    .status-error { background: #f8d7da; color: #721c24; }
   </style>
 </head>
 <body>
@@ -233,73 +223,102 @@
     
     <!-- Header -->
     <div class="header-card">
-      <h1>🛠️ ระบบจัดการสิทธิ์เข้าถึงเอกสาร (Admin Panel)</h1>
-      <p>เลือกชื่อลูกค้า และติ๊กเลือกไฟล์ที่ต้องการมอบสิทธิ์ได้ทันที</p>
+      <h1>🛠️ ระบบจัดการหลังบ้าน (Admin Panel)</h1>
+      <p>เพิ่มลูกค้า กำหนดรหัสผ่าน และจัดการสิทธิ์อ่านเอกสารครบจบในที่เดียว</p>
     </div>
 
-    <!-- 1. หน้ากรอก PIN เข้าสู่ระบบ Admin (ป้องกันคนนอกเข้าเล่น) -->
+    <!-- 1. กรอก PIN เข้าใช้งาน -->
     <div id="pin-box">
       <div class="input-group">
         <label for="admin-pin">🔑 ใส่รหัส Admin เพื่อเข้าใช้งาน:</label>
-        <input type="password" id="admin-pin">
+        <input type="password" id="admin-pin" placeholder="กรอกรหัส Admin PIN">
       </div>
       <button class="btn" onclick="unlockAdmin()">เข้าสู่ระบบจัดการ</button>
       <div id="pin-error" class="status-msg status-error">รหัส Admin PIN ไม่ถูกต้อง!</div>
     </div>
 
-    <!-- 2. ส่วนจัดการสิทธิ์ (จะแสดงเมื่อใส่ PIN ถูกต้อง) -->
+    <!-- 2. ส่วนทำงานหลักหลังบ้าน -->
     <div id="admin-content">
+
+      <!-- โซน 1: เพิ่มผู้ใช้/ลูกค้าใหม่ -->
       <div class="panel-card">
+        <h2>➕ 1. เพิ่มชื่อผู้ใช้และรหัสผ่านใหม่</h2>
         
-        <!-- เลือก หรือ พิมพ์ชื่อลูกค้า -->
         <div class="input-group">
-          <label for="user-select">👤 เลือกชื่อผู้ใช้ (ลูกค้า):</label>
+          <label for="new-username">ชื่อผู้ใช้ (Username / ชื่อลูกค้านิสิต):</label>
+          <input type="text" id="new-username" placeholder="เช่น somchai65">
+        </div>
+
+        <div class="input-group">
+          <label for="new-passcode">รหัสผ่าน (Access Code / เลขท้ายสลิป):</label>
+          <input type="text" id="new-passcode">
+        </div>
+
+        <button class="btn" onclick="createNewUser()">บันทึกเพิ่มลูกค้าใหม่</button>
+        <div id="create-user-status" class="status-msg"></div>
+      </div>
+
+      <!-- โซน 2: ติ๊กเลือกไฟล์แจกสิทธิ์ -->
+      <div class="panel-card">
+        <h2>📂 2. ติ๊กแจกสิทธิ์การเข้าถึงไฟล์ PDF</h2>
+
+        <div class="input-group">
+          <label for="user-select">เลือกลูกค้าที่ต้องการมอบสิทธิ์:</label>
           <select id="user-select" onchange="onUserSelected()">
-            <option value="">-- กำลังโหลดรายชื่อลูกค้า... --</option>
+            <option value="">-- กำลังโหลดรายชื่อ... --</option>
           </select>
         </div>
 
-        <div class="input-group">
-          <label for="custom-username">หรือ พิมพ์ชื่อผู้ใช้ใหม่เอง:</label>
-          <input type="text" id="custom-username" placeholder="พิมพ์ Username เช่น user123" oninput="onCustomUserTyped()">
-        </div>
-
-      </div>
-
-      <!-- รายการไฟล์สำหรับกดติ๊กสิทธิ์ -->
-      <div class="panel-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 style="font-size: 16px;">📂 รายการไฟล์ในระบบ <span id="file-count" class="badge-count">0</span></h3>
-          <div class="quick-actions">
-            <button class="btn-sm" onclick="selectAllFiles(true)">ติ๊กเลือกทั้งหมด</button>
-            <button class="btn-sm" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <label style="font-size: 13px; font-weight: 600;">เลือกไฟล์ที่สิทธิ์อ่านได้ (<span id="file-count">0</span>):</label>
+          <div>
+            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer;" onclick="selectAllFiles(true)">เลือกทั้งหมด</button>
+            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer;" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
           </div>
         </div>
 
         <div id="file-checkbox-container" class="file-checkbox-list">
-          <p style="text-align: center; color: var(--sub-text); padding: 20px;">⏳ กำลังโหลดรายการไฟล์ทั้งหมด...</p>
+          <p style="text-align: center; color: var(--sub-text); padding: 15px;">⏳ กำลังโหลดรายการไฟล์ทั้งหมด...</p>
         </div>
 
         <button class="btn" onclick="savePermissions()">💾 บันทึกสิทธิ์การเข้าถึงไฟล์</button>
         <div id="save-status" class="status-msg"></div>
       </div>
+
+      <!-- โซน 3: ตารางดูรายชื่อลูกค้าและรหัสผ่านทั้งหมด -->
+      <div class="panel-card">
+        <h2>📋 3. รายชื่อลูกค้าและรหัสผ่านทั้งหมด</h2>
+        <div class="user-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Access Code (รหัสผ่าน)</th>
+                <th>การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="user-table-body">
+              <tr><td colspan="3" style="text-align:center;">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
   <script>
-    // Config Supabase
     const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
     const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // รหัส Admin PIN ตั้งต้น (คุณสามารถเปลี่ยนตรงนี้เป็นรหัสที่คุณชอบได้)
-    const ADMIN_PIN = "2537";
+    // สามารถเปลี่ยนรหัส Admin PIN ได้ตรงนี้
+    const ADMIN_PIN = "1234";
 
     let allFiles = [];
     let selectedUser = "";
 
-    // ยืนยันรหัส Admin
     function unlockAdmin() {
       const inputPin = document.getElementById("admin-pin").value;
       const errorMsg = document.getElementById("pin-error");
@@ -313,31 +332,91 @@
       }
     }
 
-    // โหลดข้อมูลเริ่มต้นเมื่อล็อกอินผ่าน
     async function initAdminPanel() {
       await fetchUsersList();
       await fetchAllFiles();
     }
 
-    // 1. ดึงรายชื่อลูกค้าทั้งหมดจากตาราง user_access_codes
-    async function fetchUsersList() {
-      const userSelect = document.getElementById("user-select");
-      
-      const { data: users, error } = await _supabase
-        .from('user_access_codes')
-        .select('username')
-        .order('username', { ascending: true });
+    // 1. เพิ่มผู้ใช้ใหม่ลงฐานข้อมูล (user_access_codes)
+    async function createNewUser() {
+      const usernameInput = document.getElementById("new-username").value.trim();
+      const passcodeInput = document.getElementById("new-passcode").value.trim();
+      const statusBox = document.getElementById("create-user-status");
 
-      if (error || !users || users.length === 0) {
-        userSelect.innerHTML = `<option value="">-- ไม่พบรายชื่อ หรือพิมพ์เองด้านล่าง --</option>`;
+      if (!usernameInput || !passcodeInput) {
+        statusBox.className = "status-msg status-error";
+        statusBox.innerText = "❌ กรุณากรอกทั้ง Username และ รหัสผ่านน้า";
+        statusBox.style.display = "block";
         return;
       }
 
-      userSelect.innerHTML = `<option value="">-- เลือกชื่อผู้ใช้จากระบบ --</option>` + 
-        users.map(u => `<option value="${u.username}">${u.username}</option>`).join('');
+      statusBox.className = "status-msg";
+      statusBox.style.background = "#fff3cd";
+      statusBox.style.color = "#856404";
+      statusBox.innerText = "⏳ กำลังบันทึกข้อมูล...";
+      statusBox.style.display = "block";
+
+      const { error } = await _supabase
+        .from('user_access_codes')
+        .insert([{ username: usernameInput, access_code: passcodeInput }]);
+
+      if (error) {
+        statusBox.className = "status-msg status-error";
+        statusBox.innerText = "❌ เพิ่มไม่สำเร็จ (อาจมี Username นี้อยู่แล้ว): " + error.message;
+      } else {
+        statusBox.className = "status-msg status-success";
+        statusBox.innerText = `✅ เพิ่มลูกค้า "${usernameInput}" สำเร็จแล้ว!`;
+        
+        // เคลียร์ช่องป้อนข้อมูล
+        document.getElementById("new-username").value = "";
+        document.getElementById("new-passcode").value = "";
+
+        // โหลดรายชื่อผู้ใช้ใหม่ และเลือกชื่อผู้ใช้นี้อัตโนมัติเพื่อให้ติ๊กสิทธิ์ต่อได้ทันที
+        await fetchUsersList();
+        document.getElementById("user-select").value = usernameInput;
+        onUserSelected();
+      }
     }
 
-    // 2. ดึงไฟล์ PDF ทั้งหมดจาก Supabase Storage (pdf-files)
+    // 2. ดึงรายชื่อผู้ใช้ทั้งหมด
+    async function fetchUsersList() {
+      const userSelect = document.getElementById("user-select");
+      const tableBody = document.getElementById("user-table-body");
+      
+      const { data: users, error } = await _supabase
+        .from('user_access_codes')
+        .select('*')
+        .order('username', { ascending: true });
+
+      if (error || !users || users.length === 0) {
+        userSelect.innerHTML = `<option value="">-- ไม่พบรายชื่อลูกค้า --</option>`;
+        tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">ยังไม่มีข้อมูลลูกค้า</td></tr>`;
+        return;
+      }
+
+      // ใส่ลง Dropdown
+      userSelect.innerHTML = `<option value="">-- เลือกชื่อผู้ใช้จากระบบ --</option>` + 
+        users.map(u => `<option value="${u.username}">${u.username}</option>`).join('');
+
+      // ใส่ลง ตารางแสดงรายชื่อ & รหัสผ่าน
+      tableBody.innerHTML = users.map(u => `
+        <tr>
+          <td><b>${u.username}</b></td>
+          <td><code>${u.access_code}</code></td>
+          <td>
+            <button style="padding: 2px 8px; font-size:11px; cursor:pointer;" onclick="selectUserFromTable('${u.username}')">จัดการสิทธิ์</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function selectUserFromTable(username) {
+      document.getElementById("user-select").value = username;
+      onUserSelected();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    // 3. ดึงไฟล์ทั้งหมดใน Storage
     async function fetchAllFiles() {
       const container = document.getElementById("file-checkbox-container");
       
@@ -348,14 +427,12 @@
         return;
       }
 
-      // กรองเฉพาะไฟล์ PDF (ไม่เอาโฟลเดอร์หรือไฟล์ซ่อน)
       allFiles = files.filter(f => !f.name.startsWith('.') && f.name.endsWith('.pdf'));
       document.getElementById("file-count").innerText = allFiles.length;
 
       renderFileCheckboxes([]);
     }
 
-    // แสดงผล Checkbox สำหรับไฟล์
     function renderFileCheckboxes(allowedFiles) {
       const container = document.getElementById("file-checkbox-container");
       
@@ -375,12 +452,8 @@
       }).join('');
     }
 
-    // เมื่อเลือกผู้ใช้จาก Dropdown
     async function onUserSelected() {
-      const userSelect = document.getElementById("user-select");
-      selectedUser = userSelect.value;
-      document.getElementById("custom-username").value = "";
-
+      selectedUser = document.getElementById("user-select").value;
       if (selectedUser) {
         await loadUserPermissions(selectedUser);
       } else {
@@ -388,20 +461,6 @@
       }
     }
 
-    // เมื่อพิมพ์ชื่อผู้ใช้เอง
-    async function onCustomUserTyped() {
-      const customInput = document.getElementById("custom-username");
-      selectedUser = customInput.value.trim();
-      document.getElementById("user-select").value = "";
-
-      if (selectedUser) {
-        await loadUserPermissions(selectedUser);
-      } else {
-        renderFileCheckboxes([]);
-      }
-    }
-
-    // โหลดสิทธิ์เดิมของลูกค้าคนนี้ว่ามีไฟล์ไหนอยู่แล้วบ้าง
     async function loadUserPermissions(username) {
       const { data: userPerms, error } = await _supabase
         .from('user_permissions')
@@ -417,25 +476,23 @@
       renderFileCheckboxes(allowedFiles);
     }
 
-    // ปุ่ม ติ๊กเลือกทั้งหมด / ยกเลิกทั้งหมด
     function selectAllFiles(shouldSelect) {
       const checkboxes = document.querySelectorAll('.file-chk');
       checkboxes.forEach(chk => chk.checked = shouldSelect);
     }
 
-    // 💾 บันทึกสิทธิ์ลง Supabase
+    // 4. บันทึกสิทธิ์ลงตาราง user_permissions
     async function savePermissions() {
       const statusBox = document.getElementById("save-status");
       statusBox.style.display = "none";
 
       if (!selectedUser) {
         statusBox.className = "status-msg status-error";
-        statusBox.innerText = "❌ กรุณาเลือกหรือพิมพ์ชื่อผู้ใช้ก่อนน้า!";
+        statusBox.innerText = "❌ กรุณาเลือกชื่อผู้ใช้ก่อนบันทึกน้า!";
         statusBox.style.display = "block";
         return;
       }
 
-      // ดึงรายชื่อไฟล์ที่ถูกติ๊กถูก
       const checkedBoxes = document.querySelectorAll('.file-chk:checked');
       const selectedFiles = Array.from(checkedBoxes).map(chk => chk.value);
 
@@ -446,13 +503,11 @@
       statusBox.style.display = "block";
 
       try {
-        // 1. ลบสิทธิ์เดิมทั้งหมดของลูกค้ารายนี้ก่อน
         await _supabase
           .from('user_permissions')
           .delete()
           .ilike('username', selectedUser);
 
-        // 2. ถ้ามีไฟล์ถูกติ๊ก ให้ทำการเพิ่มรายการใหม่ลงตาราง user_permissions
         if (selectedFiles.length > 0) {
           const insertData = selectedFiles.map(fileName => ({
             username: selectedUser,
