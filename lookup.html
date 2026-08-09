@@ -4,19 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เช็ครหัสผ่านเข้าใช้งาน - My KeySpace</title>
+  
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     /* ธีมปกติ (Light Mode) */
     :root {
-      --primary: #E2A99B;
-      --primary-dark: #C88675;
       --bg-color: #FDFBF7;
       --card-bg: #FFFFFF;
       --text-color: #4A3E3D;
       --sub-text: #8E756C;
       --border: #E8DFD8;
       --input-bg: #FFFFFF;
+      --primary: #E2A99B;
+      --primary-dark: #C88675;
       --shadow: rgba(0, 0, 0, 0.05);
     }
 
@@ -42,31 +47,54 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
-      padding: 20px;
+      padding: 16px;
       display: flex;
       justify-content: center;
-      align-items: center;
       min-height: 100vh;
     }
 
     .container {
       width: 100%;
-      max-width: 450px;
+      max-width: 680px;
+      position: relative;
     }
 
-    .top-bar-lookup {
+    /* แถบด้านบน (Header Top Bar) */
+    .top-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      justify-content: space-between;
+      background: var(--card-bg);
+      padding: 10px 18px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 20px;
     }
 
+    .logo-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .right-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ปุ่มเปลี่ยนโหมด (ไอคอนทรงกลม) */
     .btn-theme-icon {
       width: 36px;
       height: 36px;
       border-radius: 50%;
       border: 1px solid var(--border);
-      background: var(--card-bg);
+      background: var(--bg-color);
       color: var(--text-color);
       cursor: pointer;
       font-size: 16px;
@@ -80,30 +108,101 @@
       border-color: var(--primary);
     }
 
-    .card {
-      background: var(--card-bg);
+    /* ป้ายแสดงสถานะ / ปุ่มเข้าสู่ระบบ */
+    .badge-status {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
       border-radius: 20px;
+      background: var(--bg-color);
+      color: var(--sub-text);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .badge-status:hover {
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    /* เมนู 3 ขีด */
+    .menu-container {
+      position: relative;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--text-color);
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 38px;
+      background-color: var(--card-bg);
+      min-width: 170px;
+      box-shadow: 0px 8px 20px var(--shadow);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      z-index: 100;
+      overflow: hidden;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: var(--text-color);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-content a:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--border);
+    }
+
+    /* กล่องการ์ดค้นหารหัสผ่าน */
+    .box-card {
+      background: var(--card-bg);
+      border-radius: 18px;
       padding: 28px 24px;
-      box-shadow: 0 4px 20px var(--shadow);
+      box-shadow: 0 4px 15px var(--shadow);
       border: 1px solid var(--border);
       text-align: center;
+      margin-bottom: 20px;
     }
 
-    .icon {
-      font-size: 48px;
-      margin-bottom: 12px;
+    .title-header {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    h1 {
+    .title-header h1 {
       font-size: 22px;
       color: var(--primary-dark);
       margin-bottom: 6px;
     }
 
-    p {
+    .title-header p {
       font-size: 14px;
       color: var(--sub-text);
-      margin-bottom: 20px;
     }
 
     .input-group {
@@ -111,18 +210,19 @@
       margin-bottom: 16px;
     }
 
-    label {
+    .input-group label {
       display: block;
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 6px;
+      color: var(--text-color);
     }
 
-    input {
+    input[type="text"] {
       width: 100%;
       padding: 12px 14px;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px;
       font-size: 15px;
       outline: none;
       background: var(--input-bg);
@@ -140,7 +240,7 @@
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
@@ -182,6 +282,10 @@
       cursor: pointer;
     }
 
+    .btn-copy:hover {
+      background: var(--primary-dark);
+    }
+
     .btn-go-web {
       display: inline-block;
       margin-top: 15px;
@@ -190,7 +294,7 @@
       background: #28a745;
       color: white;
       text-decoration: none;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: 600;
     }
 
@@ -216,18 +320,41 @@
   </style>
 </head>
 <body>
+
   <div class="container">
 
-    <!-- แถบปุ่มสลับโหมดมืด -->
-    <div class="top-bar-lookup">
-      <a href="index.html" class="back-home-link">←</a>
-      <button id="theme-btn" onclick="toggleTheme()" class="btn-theme-icon" title="สลับโหมดมืด/สว่าง">🌙</button>
+    <!-- แถบเมนูด้านบน (Header Top Bar) -->
+    <div class="top-bar">
+      <!-- ซ้าย: ชื่อเว็บ (กดเพื่อกลับหน้าเข้าสู่ระบบ) -->
+      <a href="index.html" class="logo-title">📚 My KeySpace</a>
+
+      <!-- ขวา: ปุ่มโหมดมืด + ปุ่มเข้าสู่ระบบ + ขีด 3 ขีด -->
+      <div class="right-group">
+        <button id="theme-btn" onclick="toggleTheme()" class="btn-theme-icon" title="สลับโหมดมืด/สว่าง">
+          🌙
+        </button>
+
+        <a href="index.html" class="badge-status">
+          🔒 เข้าสู่ระบบ
+        </a>
+
+        <div class="menu-container">
+          <button class="menu-btn" onclick="toggleMenu()">☰</button>
+          <div id="dropdown-menu" class="dropdown-content">
+            <a href="#" onclick="showRules()">📜 กฎการใช้งาน</a>
+            <a href="https://line.me/R/ti/p/@your-line-id" target="_blank" id="menu-contact">💬 ติดต่อแอดมิน</a>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="icon">🔍</div>
-      <h1>เช็ครหัสผ่านเข้าใช้งาน</h1>
-      <p>กรอก Username ของคุณ เพื่อดึงรหัสผ่านเข้าอ่านเฉลย</p>
+    <!-- กล่องเช็ครหัสผ่าน -->
+    <div class="box-card">
+      <div class="title-header">
+        <div style="font-size: 42px; margin-bottom: 8px;">🔍</div>
+        <h1>เช็ครหัสผ่านเข้าใช้งาน</h1>
+        <p>กรอก Username ของคุณ เพื่อดึงรหัสผ่านเข้าอ่านเฉลย</p>
+      </div>
 
       <div class="input-group">
         <label for="search-user">ชื่อผู้ใช้ (Username):</label>
@@ -243,7 +370,12 @@
         <button class="btn-copy" onclick="copyCode()">📋 คัดลอกรหัสผ่าน</button>
         <a href="index.html" class="btn-go-web">🚀 ไปหน้าเข้าสู่ระบบทันที</a>
       </div>
+
+      <div style="text-align: center;">
+        <a href="index.html" class="back-home-link">← ย้อนกลับไปหน้าเข้าสู่ระบบ</a>
+      </div>
     </div>
+
   </div>
 
   <script>
@@ -277,6 +409,25 @@
         localStorage.setItem("user_theme", "light");
         if (themeBtn) themeBtn.innerText = "🌙";
       }
+    }
+
+    // --- ระบบเมนู & กฎการใช้งาน ---
+    function toggleMenu() {
+      const menu = document.getElementById("dropdown-menu");
+      if (menu) menu.classList.toggle("show");
+    }
+
+    window.addEventListener("click", (e) => {
+      if (!e.target.matches('.menu-btn')) {
+        const menu = document.getElementById("dropdown-menu");
+        if (menu && menu.classList.contains("show")) {
+          menu.classList.remove("show");
+        }
+      }
+    });
+
+    function showRules() {
+      alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
     }
 
     document.addEventListener("DOMContentLoaded", initTheme);
