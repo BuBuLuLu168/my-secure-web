@@ -272,6 +272,19 @@
       background: var(--primary-dark);
     }
 
+    .forgot-link {
+      color: var(--sub-text);
+      font-size: 13px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
     .error-msg {
       color: #d9534f;
       font-size: 13px;
@@ -349,8 +362,7 @@
           <button class="menu-btn" onclick="toggleMenu()">☰</button>
           <div id="dropdown-menu" class="dropdown-content">
             <a href="#" onclick="showRules()">📜 กฎการใช้งาน</a>
-            <!-- ใส่ URL ลิงก์ LINE Official / LINE ส่วนตัว ตรง href ได้เลยครับ -->
-            <a href="https://line.me/ti/p/qdWRxhabzh" target="_blank" id="menu-contact">💬 ติดต่อแอดมิน</a>
+            <a href="https://line.me/R/ti/p/@your-line-id" target="_blank" id="menu-contact">💬 ติดต่อแอดมิน</a>
             <a href="#" id="menu-logout" onclick="logout()" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
           </div>
         </div>
@@ -376,6 +388,13 @@
 
       <button class="btn" onclick="checkAccess()">เข้าสู่ระบบ</button>
       <div id="error-msg" class="error-msg"></div>
+
+      <!-- ปุ่มลืมรหัสผ่าน -->
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="lookup.html" class="forgot-link">
+          🔑 ลืมรหัสผ่าน? เช็ครหัสผ่านที่นี่
+        </a>
+      </div>
     </div>
 
     <!-- 2. หน้าหลักผู้ใช้ (Dashboard Box) -->

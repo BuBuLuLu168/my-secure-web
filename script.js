@@ -1,5 +1,5 @@
 // ==========================================
-// My KeySpace - Main Script ( Customer Side )
+// My KeySpace - Main Script
 // ==========================================
 
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
@@ -8,13 +8,12 @@ const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ตั้งค่า PDF.js Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let currentLoggedInUser = "";
 
 // ------------------------------------------
-// 0. ระบบสลับโหมดมืด / โหมดสว่าง (Dark Mode)
+// 0. ระบบสลับโหมดมืด / โหมดสว่าง
 // ------------------------------------------
 
 function initTheme() {
@@ -43,7 +42,6 @@ function toggleTheme() {
   }
 }
 
-// เรียกทำงานธีมทันทีที่โหลดหน้าเว็บ
 document.addEventListener("DOMContentLoaded", initTheme);
 
 // ------------------------------------------
@@ -69,7 +67,7 @@ function showRules() {
 }
 
 // ------------------------------------------
-// 2. ระบบเข้าสู่ระบบ (Case-insensitive)
+// 2. ระบบเข้าสู่ระบบ
 // ------------------------------------------
 
 async function checkAccess() {
@@ -102,7 +100,8 @@ async function checkAccess() {
   
   const statusBadge = document.getElementById("status-badge");
   statusBadge.className = "badge-status badge-online";
-  statusBadge.innerText = `👤 ${currentLoggedInUser}`;
+  statusBadge.innerHTML = `👤 ${currentLoggedInUser}`;
+  
   document.getElementById("menu-logout").style.display = "block";
   document.getElementById("user-display-name").innerText = currentLoggedInUser;
 
@@ -193,7 +192,7 @@ function filterFiles() {
 }
 
 // ------------------------------------------
-// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล (ป้องกัน Cache)
+// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล
 // ------------------------------------------
 
 async function openPdfViewer(fileName, fileUrl) {
@@ -273,7 +272,7 @@ function logout() {
 
   const statusBadge = document.getElementById("status-badge");
   statusBadge.className = "badge-status";
-  statusBadge.innerText = "🔒 ยังไม่ได้เข้าสู่ระบบ";
+  statusBadge.innerHTML = "🔒 เข้าสู่ระบบ";
   
   document.getElementById("username").value = "";
   document.getElementById("access-code").value = "";

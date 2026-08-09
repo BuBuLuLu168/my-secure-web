@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* ธีมปกติ (Light Mode) */
     :root {
       --primary: #E2A99B;
       --primary-dark: #C88675;
@@ -15,14 +16,19 @@
       --text-color: #4A3E3D;
       --sub-text: #8E756C;
       --border: #E8DFD8;
+      --input-bg: #FFFFFF;
+      --shadow: rgba(0, 0, 0, 0.05);
     }
 
+    /* ธีมมืด (Dark Mode) */
     body.dark-mode {
       --bg-color: #121212;
       --card-bg: #1E1E1E;
       --text-color: #E0E0E0;
       --sub-text: #A0A0A0;
       --border: #333333;
+      --input-bg: #2C2C2C;
+      --shadow: rgba(0, 0, 0, 0.3);
     }
 
     * {
@@ -30,6 +36,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Prompt', 'Itim', sans-serif;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
 
     body {
@@ -47,11 +54,37 @@
       max-width: 450px;
     }
 
+    .top-bar-lookup {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .btn-theme-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+    }
+
+    .btn-theme-icon:hover {
+      border-color: var(--primary);
+    }
+
     .card {
       background: var(--card-bg);
       border-radius: 20px;
       padding: 28px 24px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 20px var(--shadow);
       border: 1px solid var(--border);
       text-align: center;
     }
@@ -92,7 +125,7 @@
       border-radius: 12px;
       font-size: 15px;
       outline: none;
-      background: var(--card-bg);
+      background: var(--input-bg);
       color: var(--text-color);
     }
 
@@ -111,7 +144,6 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     .btn:hover {
@@ -168,18 +200,38 @@
       margin-top: 12px;
       display: none;
     }
+
+    .back-home-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: var(--sub-text);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .back-home-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+
+    <!-- แถบปุ่มสลับโหมดมืด -->
+    <div class="top-bar-lookup">
+      <a href="index.html" class="back-home-link">←</a>
+      <button id="theme-btn" onclick="toggleTheme()" class="btn-theme-icon" title="สลับโหมดมืด/สว่าง">🌙</button>
+    </div>
+
     <div class="card">
       <div class="icon">🔍</div>
       <h1>เช็ครหัสผ่านเข้าใช้งาน</h1>
-      <p>กรอก Username ของคุณ เพื่อดึงรหัสผ่านเข้าอ่านเอกสาร</p>
+      <p>กรอก Username ของคุณ เพื่อดึงรหัสผ่านเข้าอ่านเฉลย</p>
 
       <div class="input-group">
         <label for="search-user">ชื่อผู้ใช้ (Username):</label>
-        <input type="text" id="search-user" placeholder="กรอก Username ของคุณ... ">
+        <input type="text" id="search-user" placeholder="กรอก Username ของคุณ">
       </div>
 
       <button class="btn" onclick="lookupPasscode()">ค้นหารหัสผ่าน</button>
@@ -197,12 +249,39 @@
   <script>
     const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
     const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { createClient } = supabase;
+    const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    if (localStorage.getItem("user_theme") === "dark") {
-      document.body.classList.add("dark-mode");
+    // --- ระบบโหมดมืด ---
+    function initTheme() {
+      const savedTheme = localStorage.getItem("user_theme");
+      const themeBtn = document.getElementById("theme-btn");
+
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        if (themeBtn) themeBtn.innerText = "☀️";
+      } else {
+        document.body.classList.remove("dark-mode");
+        if (themeBtn) themeBtn.innerText = "🌙";
+      }
     }
 
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle("dark-mode");
+      const themeBtn = document.getElementById("theme-btn");
+
+      if (isDark) {
+        localStorage.setItem("user_theme", "dark");
+        if (themeBtn) themeBtn.innerText = "☀️";
+      } else {
+        localStorage.setItem("user_theme", "light");
+        if (themeBtn) themeBtn.innerText = "🌙";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", initTheme);
+
+    // --- ระบบดึงรหัสผ่านจาก Supabase ---
     async function lookupPasscode() {
       const user = document.getElementById("search-user").value.trim();
       const errorMsg = document.getElementById("error-msg");
@@ -218,20 +297,30 @@
         return;
       }
 
-      const { data, error } = await _supabase
-        .from('user_access_codes')
-        .select('access_code')
-        .ilike('username', user)
-        .maybeSingle();
+      try {
+        const { data, error } = await _supabase
+          .from('user_access_codes')
+          .select('access_code')
+          .ilike('username', user);
 
-      if (error || !data) {
-        errorMsg.innerText = "❌ ไม่พบชื่อผู้ใช้นี้ในระบบ กรุณาตรวจสอบหรือติดต่อแอดมิน";
+        if (error) {
+          errorMsg.innerText = "❌ เกิดข้อผิดพลาดจากระบบ: " + error.message;
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          errorMsg.innerText = "❌ ไม่พบชื่อผู้ใช้นี้ในระบบ กรุณาตรวจสอบอีกครั้งน้า";
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        passcodeDisplay.innerText = data[0].access_code;
+        resultBox.style.display = "block";
+      } catch (err) {
+        errorMsg.innerText = "❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้: " + err.message;
         errorMsg.style.display = "block";
-        return;
       }
-
-      passcodeDisplay.innerText = data.access_code;
-      resultBox.style.display = "block";
     }
 
     function copyCode() {
