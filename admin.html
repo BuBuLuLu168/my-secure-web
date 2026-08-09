@@ -8,7 +8,7 @@
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- jsQR CDN (สำหรับสแกน QR Code บนสลิป) -->
+  <!-- jsQR CDN (สำหรับสแกน QR Code) -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
   <!-- Tesseract.js CDN (สำหรับอ่านข้อความภาษาไทย/อังกฤษ) -->
@@ -279,7 +279,7 @@
     <div id="pin-box">
       <div class="input-group">
         <label for="admin-pin">🔑 ใส่รหัส Admin เพื่อเข้าใช้งาน:</label>
-        <input type="password" id="admin-pin" placeholder="กรอกรหัส Admin PIN">
+        <input type="password" id="admin-pin">
       </div>
       <button class="btn" onclick="unlockAdmin()">เข้าสู่ระบบจัดการ</button>
       <div id="pin-error" class="status-msg status-error">รหัส Admin PIN ไม่ถูกต้อง!</div>
@@ -301,14 +301,13 @@
         <div id="upload-status" class="status-msg"></div>
       </div>
 
-      <!-- โซนสแกนสลิปแบบ Hybrid (QR Code + OCR) -->
+      <!-- โซนสแกนสลิปอัตโนมัติ -->
       <div class="panel-card">
-        <h2>🧾 สแกนสลิปโอนเงิน (QR Code + อ่านตัวอักษร)</h2>
+        <h2>🧾 สแกนสลิปโอนเงิน</h2>
         
         <div class="dropzone" onclick="document.getElementById('slip-input').click()">
-          <div style="font-size: 32px;">🔍</div>
+          <div style="font-size: 32px;">📸</div>
           <strong style="color: var(--primary-dark);">คลิกที่นี่ หรือ ลากรูปสลิปมาวาง</strong>
-          <p>ระบบจะสแกน QR Code หาเลขรายการ และใช้ OCR อ่านชื่อผู้โอนให้อัตโนมัติ</p>
           <input type="file" id="slip-input" accept="image/*" style="display: none;" onchange="handleSlipUpload(event)">
         </div>
         <div id="ocr-status" class="status-msg"></div>
@@ -320,7 +319,7 @@
         
         <div class="input-group">
           <label for="new-username">ชื่อผู้ใช้ (Username):</label>
-          <input type="text" id="new-username">
+          <input type="text" id="new-username" placeholder="เช่น somchai">
         </div>
 
         <div class="input-group">
@@ -483,7 +482,7 @@
       }
     }
 
-    // --- สแกนสลิป 2 ระบบ (QR Code + Tesseract OCR) ---
+    // --- ระบบสแกนสลิปโอนเงิน (ดึงชื่อคนโอน + 4 ตัวอักษรท้ายสุดของเลขรายการ) ---
     async function handleSlipUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -492,7 +491,7 @@
       statusBox.style.display = "block";
       statusBox.style.background = "#fff3cd";
       statusBox.style.color = "#856404";
-      statusBox.innerText = "⏳ กำลังสแกน QR Code และอ่านข้อความบนสลิป...";
+      statusBox.innerText = "⏳ กำลังสแกนสลิปเพื่อค้นหาข้อมูล...";
 
       let foundPasscode = "";
       let foundUsername = "";
@@ -501,7 +500,7 @@
       img.src = URL.createObjectURL(file);
 
       img.onload = async () => {
-        // 1. สแกน QR Code ด้วย jsQR
+        // 1. สแกน QR Code หา 4 ตัวอักษรท้ายสุดของรหัสใน QR Code
         try {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
@@ -512,19 +511,16 @@
 
           const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
           if (qrCode && qrCode.data) {
-            const digitMatches = qrCode.data.match(/\d+/g);
-            if (digitMatches && digitMatches.length > 0) {
-              const longestDigits = digitMatches.reduce((a, b) => a.length >= b.length ? a : b);
-              foundPasscode = longestDigits.slice(-4);
-            } else {
-              foundPasscode = qrCode.data.slice(-4);
+            const cleanQr = qrCode.data.trim();
+            if (cleanQr.length >= 4) {
+              foundPasscode = cleanQr.slice(-4); // เอา 4 ตัวท้ายสุดโดยไม่ตัดประเภทตัวอักษร
             }
           }
         } catch (e) {
-          console.log("QR Code read error:", e);
+          console.log("QR Code error:", e);
         }
 
-        // 2. สแกนข้อความด้วย Tesseract OCR (ดึงชื่อ + สำรองเลขท้ายกรณีสแกน QR ไม่เจอ)
+        // 2. อ่านข้อความสลิปด้วย Tesseract OCR
         try {
           const worker = await Tesseract.createWorker('tha+eng');
           const ret = await worker.recognize(file);
@@ -532,31 +528,58 @@
 
           const rawText = ret.data.text;
 
-          if (!foundPasscode) {
-            const numberMatches = rawText.match(/\b\d{4,}\b/g);
-            if (numberMatches && numberMatches.length > 0) {
-              const lastNum = numberMatches[numberMatches.length - 1];
-              foundPasscode = lastNum.slice(-4);
+          // --- 2.1 ดึงชื่อผู้โอน (ตัดเอาเฉพาะโซนคนโอนข้างบน + เอาเฉพาะชื่อหน้า) ---
+          let senderText = rawText;
+          const toIndex = rawText.search(/(ไปยัง|โอนไปยัง|To\b|ผู้รับเงิน|เข้าบัญชี)/i);
+          if (toIndex !== -1) {
+            senderText = rawText.substring(0, toIndex);
+          }
+
+          const nameWithPrefix = senderText.match(/(?:นาย|นางสาว|นาง|คุณ|Mr\.|Mrs\.|Ms\.)\s*([ก-๙A-Za-z]+)/i);
+          if (nameWithPrefix && nameWithPrefix[1]) {
+            foundUsername = nameWithPrefix[1].trim();
+          } else {
+            const fromMatch = senderText.match(/(?:จาก|From)\s*[:\s]*([ก-๙A-Za-z]+)/i);
+            if (fromMatch && fromMatch[1]) {
+              const tempName = fromMatch[1].trim();
+              const ignoreList = ["โอนเงิน", "สำเร็จ", "ธนาคาร", "บัญชี", "กสิกร", "ไทยพาณิชย์", "กรุงไทย", "กรุงเทพ", "ออมสิน"];
+              if (!ignoreList.includes(tempName)) {
+                foundUsername = tempName;
+              }
             }
           }
 
-          const nameMatch = rawText.match(/(นาย|นางสาว|นาง|คุณ)\s*([ก-๙]+(?:\s+[ก-๙]+)?)/);
-          if (nameMatch) {
-            foundUsername = (nameMatch[1] + nameMatch[2]).replace(/\s+/g, "");
-          } else {
-            const altMatch = rawText.match(/([A-Za-z]+\s+[A-Za-z]+)/);
-            if (altMatch) foundUsername = altMatch[1].replace(/\s+/g, "");
+          if (!foundUsername) {
+            const cleanText = senderText.replace(/(โอนเงิน|สำเร็จ|รายการ|สลิป|ธนาคาร|กสิกร|ไทยพาณิชย์|กรุงไทย|กรุงเทพ|ออมสิน|กรุงศรี|TTB|CIMB|UOB|จาก|From|บัญชี|จำนวน)/g, ' ');
+            const words = cleanText.match(/[ก-๙]{2,}/g);
+            if (words && words.length > 0) {
+              foundUsername = words[0].trim();
+            }
           }
+
+          // --- 2.2 ดึง 4 ตัวท้ายสุดจากช่อง "เลขที่ทำรายการ/รหัสอ้างอิง" (นับรวมตัวอักษรภาษาไทย/อังกฤษ) ---
+          if (!foundPasscode) {
+            const txMatch = rawText.match(/(?:เลขที่ทำรายการ|เลขที่รายการ|รหัสอ้างอิง|เลขที่อ้างอิง|Ref\.?\s*No\.?|Txn\s*ID)[\s:-]*([A-Za-z0-9ก-๙\-_]+)/i);
+            if (txMatch && txMatch[1]) {
+              const txStr = txMatch[1].trim();
+              if (txStr.length >= 4) {
+                foundPasscode = txStr.slice(-4); // เอา 4 ตัวท้ายสุดตรงๆ ไม่ตัดภาษาไทย/อังกฤษออก
+              } else {
+                foundPasscode = txStr;
+              }
+            }
+          }
+
         } catch (err) {
           console.log("OCR Error:", err);
         }
 
-        // ใส่ค่าลงช่องป้อนข้อมูล
+        // ใส่ค่าลงในช่อง Username และ Passcode
         if (foundUsername) document.getElementById("new-username").value = foundUsername;
         if (foundPasscode) document.getElementById("new-passcode").value = foundPasscode;
 
         statusBox.className = "status-msg status-success";
-        statusBox.innerText = `✅ สแกนเสร็จสิ้น! (ดึงเลขท้าย: ${foundPasscode || 'ไม่พบ'}, ชื่อ: ${foundUsername || 'ไม่พบ'}) กรุณาตรวจเช็กก่อนกดบันทึกน้า`;
+        statusBox.innerText = `✅ สแกนเสร็จสิ้น! (ชื่อผู้โอน: ${foundUsername || 'ไม่พบ'}, 4 ตัวท้าย: ${foundPasscode || 'ไม่พบ'}) ตรวจเช็กก่อนกดบันทึกน้า`;
       };
     }
 
