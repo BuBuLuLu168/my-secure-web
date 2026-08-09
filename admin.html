@@ -231,7 +231,7 @@
     <div id="pin-box">
       <div class="input-group">
         <label for="admin-pin">🔑 ใส่รหัส Admin เพื่อเข้าใช้งาน:</label>
-        <input type="password" id="admin-pin" placeholder="กรอกรหัส Admin PIN">
+        <input type="password" id="admin-pin">
       </div>
       <button class="btn" onclick="unlockAdmin()">เข้าสู่ระบบจัดการ</button>
       <div id="pin-error" class="status-msg status-error">รหัส Admin PIN ไม่ถูกต้อง!</div>
@@ -246,7 +246,7 @@
         
         <div class="input-group">
           <label for="new-username">ชื่อผู้ใช้ (Username / ชื่อลูกค้านิสิต):</label>
-          <input type="text" id="new-username" placeholder="เช่น somchai65">
+          <input type="text" id="new-username">
         </div>
 
         <div class="input-group">
@@ -314,7 +314,7 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // สามารถเปลี่ยนรหัส Admin PIN ได้ตรงนี้
-    const ADMIN_PIN = "1234";
+    const ADMIN_PIN = "2537";
 
     let allFiles = [];
     let selectedUser = "";
