@@ -33,6 +33,9 @@
             <a href="#" onclick="showRules(); return false;">⚠️ กฎการใช้งาน</a>
             <a href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
             <a href="#" id="menu-logout" onclick="logout(); return false;" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
+            <button id="theme-btn" onclick="toggleTheme()" class="btn-theme" style="padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-color); cursor: pointer;">
+  🌙 โหมดมืด
+</button>
           </div>
         </div>
       </div>
@@ -44,7 +47,7 @@
     <!-- 1. หน้าต่างเข้าสู่ระบบ (Login Box) -->
     <div id="login-box" class="card-box">
       <h2>🔐 เข้าสู่ระบบ</h2>
-      <p class="subtitle">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าชมคลังเฉลย</p>
+      <p class="subtitle">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าสู่ระบบ</p>
 
       <div class="form-group">
         <label for="username">ชื่อผู้ใช้ (Username)</label>

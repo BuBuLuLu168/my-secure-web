@@ -1,3 +1,43 @@
+/* ธีมปกติ (Light Mode) */
+:root {
+  --bg-color: #FDFBF7;
+  --card-bg: #FFFFFF;
+  --text-color: #4A3E3D;
+  --sub-text: #8E756C;
+  --border: #E8DFD8;
+  --input-bg: #FFFFFF;
+  --primary: #E2A99B;
+  --primary-dark: #C88675;
+}
+
+/* ธีมมืด (Dark Mode) */
+body.dark-mode {
+  --bg-color: #121212;
+  --card-bg: #1E1E1E;
+  --text-color: #E0E0E0;
+  --sub-text: #A0A0A0;
+  --border: #333333;
+  --input-bg: #2C2C2C;
+}
+
+/* นำตัวแปรสีไปผูกกับส่วนประกอบต่างๆ */
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.file-card, .login-box, .dashboard-box, .content-box, #dropdown-menu {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border) !important;
+}
+
+input, select {
+  background-color: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border) !important;
+}
 /* Custom CSS - My KeySpace Cream & Peach Pastel Theme */
 * {
   box-sizing: border-box;

@@ -1,5 +1,5 @@
 // ==========================================
-// My KeySpace - Main Script
+// My KeySpace - Main Script ( Customer Side )
 // ==========================================
 
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
@@ -14,16 +14,47 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 let currentLoggedInUser = "";
 
 // ------------------------------------------
+// 0. ระบบสลับโหมดมืด / โหมดสว่าง (Dark Mode)
+// ------------------------------------------
+
+function initTheme() {
+  const savedTheme = localStorage.getItem("user_theme");
+  const themeBtn = document.getElementById("theme-btn");
+
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+    if (themeBtn) themeBtn.innerText = "☀️ โหมดสว่าง";
+  } else {
+    document.body.classList.remove("dark-mode");
+    if (themeBtn) themeBtn.innerText = "🌙 โหมดมืด";
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle("dark-mode");
+  const themeBtn = document.getElementById("theme-btn");
+
+  if (isDark) {
+    localStorage.setItem("user_theme", "dark");
+    if (themeBtn) themeBtn.innerText = "☀️ โหมดสว่าง";
+  } else {
+    localStorage.setItem("user_theme", "light");
+    if (themeBtn) themeBtn.innerText = "🌙 โหมดมืด";
+  }
+}
+
+// เรียกทำงานธีมทันทีที่โหลดหน้าเว็บ
+document.addEventListener("DOMContentLoaded", initTheme);
+
+// ------------------------------------------
 // 1. ระบบเมนู & แจ้งเตือน
 // ------------------------------------------
 
-// เปิด / ปิด เมนูดรอปดาวน์
 function toggleMenu() {
   const menu = document.getElementById("dropdown-menu");
-  menu.classList.toggle("show");
+  if (menu) menu.classList.toggle("show");
 }
 
-// ปิดเมนูเมื่อคลิกพื้นที่อื่น
 window.addEventListener("click", (e) => {
   if (!e.target.matches('.menu-btn')) {
     const menu = document.getElementById("dropdown-menu");
@@ -33,7 +64,6 @@ window.addEventListener("click", (e) => {
   }
 });
 
-// แสดงแจ้งเตือนกฎการใช้งาน
 function showRules() {
   alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
 }
@@ -53,7 +83,6 @@ async function checkAccess() {
     return;
   }
 
-  // ใช้ .ilike เพื่อยอมรับทั้งตัวพิมพ์เล็กและตัวพิมพ์ใหญ่
   const { data, error } = await _supabase
     .from('user_access_codes')
     .select('*')
@@ -66,7 +95,6 @@ async function checkAccess() {
     return;
   }
 
-  // บันทึกชื่อผู้ใช้ที่ถูกต้องจากระบบ
   currentLoggedInUser = data[0].username;
   errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
@@ -87,9 +115,8 @@ async function checkAccess() {
 
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
-  fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C; padding:20px;'>⏳ กำลังตรวจสอบสิทธิ์เข้าถึงไฟล์...</p>";
+  fileGrid.innerHTML = "<p style='text-align:center; color:var(--sub-text); padding:20px;'>⏳ กำลังตรวจสอบสิทธิ์เข้าถึงไฟล์...</p>";
 
-  // ดึงรายการไฟล์ที่ผู้ใช้มีสิทธิ์จากตาราง user_permissions (ไม่สนตัวพิมพ์เล็กใหญ่)
   const { data: userPerms, error: permError } = await _supabase
     .from('user_permissions')
     .select('file_name')
@@ -98,22 +125,18 @@ async function loadFileList() {
   fileGrid.innerHTML = "";
 
   if (permError || !userPerms || userPerms.length === 0) {
-    fileGrid.innerHTML = "<p style='text-align:center; color:#8E756C; padding:20px;'>🔒 คุณยังไม่มีสิทธิ์เข้าถึงไฟล์เฉลยในขณะนี้ กรุณาติดต่อแอดมินน้า</p>";
+    fileGrid.innerHTML = "<p style='text-align:center; color:var(--sub-text); padding:20px;'>🔒 คุณยังไม่มีสิทธิ์เข้าถึงไฟล์เฉลยในขณะนี้ กรุณาติดต่อแอดมินน้า</p>";
     appendComingSoonCard(fileGrid);
     return;
   }
 
-  // แปลงชื่อไฟล์ที่ได้รับสิทธิ์เป็น Array
   const allowedFileNames = userPerms.map(p => p.file_name);
-
-  // ดึงไฟล์ทั้งหมดจาก Supabase Storage
   const { data: storageFiles, error: storageError } = await _supabase.storage.from('pdf-files').list();
 
   if (storageFiles && storageFiles.length > 0) {
     storageFiles.forEach((file) => {
       if (file.name.startsWith('.')) return;
 
-      // แสดงเฉพาะไฟล์ที่มีในสิทธิ์ user_permissions
       if (allowedFileNames.includes(file.name)) {
         const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pdf-files/${file.name}`;
 
@@ -139,7 +162,6 @@ async function loadFileList() {
   }
 }
 
-// เพิ่มการ์ด Coming Soon ต่อท้าย
 function appendComingSoonCard(container) {
   const comingSoonCard = document.createElement("div");
   comingSoonCard.className = "file-card coming-soon-card";
@@ -151,7 +173,6 @@ function appendComingSoonCard(container) {
   container.appendChild(comingSoonCard);
 }
 
-// ค้นหาไฟล์ Real-time
 function filterFiles() {
   const searchText = document.getElementById("search-input").value.toLowerCase().trim();
   const cards = document.querySelectorAll(".file-card");
@@ -172,7 +193,7 @@ function filterFiles() {
 }
 
 // ------------------------------------------
-// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล
+// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล (ป้องกัน Cache)
 // ------------------------------------------
 
 async function openPdfViewer(fileName, fileUrl) {
@@ -181,10 +202,9 @@ async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
 
   const container = document.getElementById("pdf-container");
-  container.innerHTML = "<p style='text-align:center; color:#8E756C; font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
+  container.innerHTML = "<p style='text-align:center; color:var(--sub-text); font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
 
   try {
-    // เติม Timestamp ต่อท้าย URL บังคับให้โหลดไฟล์ใหม่ล่าสุดเสมอ ป้องกันเบราว์เซอร์ติด Cache
     const freshUrl = fileUrl.includes('?') 
       ? `${fileUrl}&t=${new Date().getTime()}` 
       : `${fileUrl}?t=${new Date().getTime()}`;
@@ -221,7 +241,6 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // วาดลายน้ำชื่อผู้ใช้พาดเอียงฝังลง Canvas
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 32px 'Itim', sans-serif";
