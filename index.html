@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    /* ธีมปกติ (Light Mode ตั้งต้น) */
+    /* ธีมปกติ (Light Mode) */
     :root {
       --bg-color: #FDFBF7;
       --card-bg: #FFFFFF;
@@ -44,13 +44,13 @@
       margin: 0;
       padding: 0;
       font-family: 'Prompt', 'Itim', sans-serif;
-      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
-      padding: 20px;
+      padding: 16px;
       display: flex;
       justify-content: center;
       min-height: 100vh;
@@ -58,7 +58,7 @@
 
     .container {
       width: 100%;
-      max-width: 650px;
+      max-width: 680px;
       position: relative;
     }
 
@@ -67,50 +67,71 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 20px;
       background: var(--card-bg);
-      padding: 12px 16px;
-      border-radius: 14px;
+      padding: 10px 18px;
+      border-radius: 50px;
       border: 1px solid var(--border);
-      box-shadow: 0 4px 10px var(--shadow);
+      box-shadow: 0 4px 12px var(--shadow);
+      margin-bottom: 20px;
     }
 
+    .logo-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .right-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ปุ่มเปลี่ยนโหมด (ไอคอนทรงกลม) */
+    .btn-theme-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+    }
+
+    .btn-theme-icon:hover {
+      border-color: var(--primary);
+    }
+
+    /* ป้ายแสดงชื่อผู้ใช้ / เข้าสู่ระบบ (กรอบมน) */
     .badge-status {
       font-size: 13px;
       font-weight: 600;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
-      background: var(--border);
+      background: var(--bg-color);
       color: var(--sub-text);
+      border: 1px solid var(--border);
       white-space: nowrap;
     }
 
     .badge-online {
       background: #E8F5E9;
       color: #2E7D32;
+      border-color: #A5D6A7;
     }
 
     body.dark-mode .badge-online {
       background: #1B381E;
       color: #81C784;
-    }
-
-    .btn-theme {
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--bg-color);
-      color: var(--text-color);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      outline: none;
-    }
-
-    .btn-theme:hover {
-      border-color: var(--primary);
+      border-color: #2E7D32;
     }
 
     /* เมนู 3 ขีด */
@@ -125,19 +146,21 @@
       cursor: pointer;
       color: var(--text-color);
       padding: 0 4px;
+      display: flex;
+      align-items: center;
     }
 
     .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
-      top: 35px;
+      top: 38px;
       background-color: var(--card-bg);
-      min-width: 160px;
-      box-shadow: 0px 8px 16px var(--shadow);
+      min-width: 170px;
+      box-shadow: 0px 8px 20px var(--shadow);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      z-index: 10;
+      border-radius: 12px;
+      z-index: 100;
       overflow: hidden;
     }
 
@@ -151,6 +174,11 @@
       text-decoration: none;
       display: block;
       font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-content a:last-child {
+      border-bottom: none;
     }
 
     .dropdown-content a:hover {
@@ -160,7 +188,7 @@
     /* การ์ดและกล่องเนื้อหา */
     .box-card {
       background: var(--card-bg);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 24px;
       box-shadow: 0 4px 15px var(--shadow);
       border: 1px solid var(--border);
@@ -229,10 +257,19 @@
 
     .btn-back {
       background: var(--sub-text);
+      color: white;
+      border: none;
+      border-radius: 10px;
       margin-bottom: 15px;
       width: auto;
       padding: 8px 16px;
       font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-back:hover {
+      background: var(--primary-dark);
     }
 
     .error-msg {
@@ -243,7 +280,6 @@
       display: none;
     }
 
-    /* กริดรายการไฟล์ */
     .file-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -254,8 +290,8 @@
     .file-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 18px;
       text-align: center;
       cursor: pointer;
       box-shadow: 0 2px 8px var(--shadow);
@@ -294,22 +330,29 @@
 
   <div class="container">
 
-    <!-- แถบเมนูด้านบน (Status + Theme Switcher + Menu) -->
+    <!-- แถบเมนูด้านบน (Header Top Bar) -->
     <div class="top-bar">
-      <!-- 1. สถานะเข้าสู่ระบบ -->
-      <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
+      <!-- ซ้าย: ชื่อเว็บ -->
+      <div class="logo-title">📚 My KeySpace</div>
 
-      <!-- 2. ปุ่มเปลี่ยนโหมดมืด/สว่าง (อยู่ตรงกลาง) -->
-      <button id="theme-btn" onclick="toggleTheme()" class="btn-theme">
-        🌙
-      </button>
+      <!-- ขวา: ปุ่มโหมดมืด + ชื่อผู้ใช้ + ขีด 3 ขีด -->
+      <div class="right-group">
+        <button id="theme-btn" onclick="toggleTheme()" class="btn-theme-icon" title="สลับโหมดมืด/สว่าง">
+          🌙
+        </button>
 
-      <!-- 3. เมนูขีด 3 ขีด -->
-      <div class="menu-container">
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <div id="dropdown-menu" class="dropdown-content">
-          <a href="#" onclick="showRules()">📜 กฎการใช้งาน</a>
-          <a href="#" id="menu-logout" onclick="logout()" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
+        <div id="status-badge" class="badge-status">
+          🔒 เข้าสู่ระบบ
+        </div>
+
+        <div class="menu-container">
+          <button class="menu-btn" onclick="toggleMenu()">☰</button>
+          <div id="dropdown-menu" class="dropdown-content">
+            <a href="#" onclick="showRules()">📜 กฎการใช้งาน</a>
+            <!-- ใส่ URL ลิงก์ LINE Official / LINE ส่วนตัว ตรง href ได้เลยครับ -->
+            <a href="https://line.me/ti/p/qdWRxhabzh" target="_blank" id="menu-contact">💬 ติดต่อแอดมิน</a>
+            <a href="#" id="menu-logout" onclick="logout()" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
+          </div>
         </div>
       </div>
     </div>
@@ -339,30 +382,25 @@
     <div id="dashboard-box" class="box-card" style="display: none;">
       <div class="title-header">
         <h2>👋 ยินดีต้อนรับคุณ <span id="user-display-name" style="color: var(--primary-dark);"></span></h2>
-        <p>เลือกรายการเอกสารเฉลยที่คุณมีสิทธิ์อ่านได้ด้านล่างนี้</p>
+        <p>เลือกรายการเอกสารที่คุณมีสิทธิ์อ่านได้ด้านล่างนี้</p>
       </div>
 
-      <!-- ช่องค้นหาไฟล์ -->
       <div class="input-group">
-        <input type="text" id="search-input" placeholder="🔍 ค้นหาชื่อไฟล์เฉลย..." oninput="filterFiles()">
+        <input type="text" id="search-input" placeholder="🔍 ค้นหาชื่อไฟล์..." oninput="filterFiles()">
       </div>
 
-      <!-- รายการไฟล์ PDF -->
-      <div id="file-grid" class="file-grid">
-        <!-- การ์ดไฟล์จะถูกดึงมาแสดงด้วย JavaScript -->
-      </div>
+      <div id="file-grid" class="file-grid"></div>
     </div>
 
     <!-- 3. หน้าอ่าน PDF (Content Box) -->
     <div id="content-box" class="box-card" style="display: none;">
-      <button class="btn btn-back" onclick="backToDashboard()">←</button>
+      <button class="btn-back" onclick="backToDashboard()">←</button>
       <h2 id="pdf-title" style="margin-bottom: 15px; color: var(--primary-dark);"></h2>
       <div id="pdf-container"></div>
     </div>
 
   </div>
 
-  <!-- เรียกใช้งานไฟล์ script.js หลัก -->
   <script src="script.js"></script>
 </body>
 </html>
