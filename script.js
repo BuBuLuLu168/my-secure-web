@@ -1,29 +1,85 @@
 // ===================================================
-// ไฟล์: script.js (ระบบดึงเอกสาร + บังคับโหลดไฟล์สดใหม่เสมอ)
+// ไฟล์: script.js (ระบบล็อกอิน + ดึงไฟล์ + บังคับโหลดไฟล์ใหม่)
 // ===================================================
 
-// 1. ฟังก์ชันแปลง URL ให้สดใหม่เสมอ (ป้องกันเบราว์เซอร์ดึงไฟล์เก่าจาก Cache)
+// 1. เชื่อมต่อ Supabase (ใส่ Anon Key ของคุณตรงช่องล่างนี้)
+const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
+const SUPABASE_ANON_KEY = "ใส่_ANON_KEY_เดิมของคุณที่นี่"; 
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 2. ฟังก์ชันแปลง URL ป้องกันไฟล์เก่าติด Cache
 function getFreshUrl(url) {
   if (!url) return '';
-  const timestamp = new Date().getTime(); // ดึงเวลาปัจจุบันเป็นมิลลิวินาที
-  // ถ้ามี query string (?) อยู่แล้วให้ใช้ &t= แต่ถ้าไม่มีให้ใช้ ?t=
+  const timestamp = new Date().getTime();
   return url.includes('?') ? `${url}&t=${timestamp}` : `${url}?t=${timestamp}`;
 }
 
-// 2. ฟังก์ชันเปิดดูเอกสาร PDF
+// 3. ฟังก์ชันล็อกอินเข้าสู่ระบบ
+async function login() {
+  const usernameInput = document.getElementById('username')?.value.trim();
+  const passwordInput = document.getElementById('password')?.value.trim();
+  const errorMsg = document.getElementById('error-msg');
+
+  if (!usernameInput || !passwordInput) {
+    if (errorMsg) errorMsg.innerText = "กรุณากรอกชื่อผู้ใช้และรหัสผ่านให้ครบถ้วน";
+    return;
+  }
+
+  // ตรวจสอบ Username / Password จากตาราง user_access_codes
+  const { data, error } = await supabase
+    .from('user_access_codes')
+    .select('*')
+    .eq('username', usernameInput)
+    .eq('access_code', passwordInput)
+    .maybeSingle();
+
+  if (error || !data) {
+    if (errorMsg) errorMsg.innerText = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+    return;
+  }
+
+  // ผ่าน -> ปิดหน้าล็อกอิน แล้วเปิดหน้า Dashboard
+  const loginBox = document.getElementById('login-box');
+  const dashboardBox = document.getElementById('dashboard-box');
+
+  if (loginBox) loginBox.style.display = 'none';
+  if (dashboardBox) dashboardBox.style.display = 'block';
+
+  // โหลดรายการไฟล์มาแสดง
+  loadFiles();
+}
+
+// 4. ฟังก์ชันดึงรายการไฟล์เอกสาร
+async function loadFiles() {
+  const fileGrid = document.getElementById('file-grid');
+  if (!fileGrid) return;
+
+  const { data: files, error } = await supabase.from('files').select('*');
+
+  if (error || !files) {
+    fileGrid.innerHTML = "<p>ไม่สามารถโหลดรายการไฟล์ได้</p>";
+    return;
+  }
+
+  fileGrid.innerHTML = files.map(file => `
+    <div class="card" onclick="openPdf('${file.title}', '${file.url}')" style="cursor: pointer;">
+      <h3>${file.title}</h3>
+      <p>คลิกเพื่ออ่านเฉลย</p>
+    </div>
+  `).join('');
+}
+
+// 5. ฟังก์ชันเปิดดูเอกสาร PDF (บังคับดึงไฟล์สดใหม่เสมอ)
 function openPdf(title, rawPdfUrl) {
   const pdfTitle = document.getElementById('pdf-title');
   const pdfContainer = document.getElementById('pdf-container');
   const dashboardBox = document.getElementById('dashboard-box');
   const contentBox = document.getElementById('content-box');
 
-  // ตั้งชื่อหัวข้อเอกสารที่เลือก
   if (pdfTitle) pdfTitle.innerText = title;
 
-  // แปลง URL ให้ติดค่า Cache-Buster ก่อนนำไปแสดงผล
   const freshUrl = getFreshUrl(rawPdfUrl);
 
-  // สั่งแสดงผลเอกสารใน pdf-container
   if (pdfContainer) {
     pdfContainer.innerHTML = `
       <iframe 
@@ -36,12 +92,11 @@ function openPdf(title, rawPdfUrl) {
     `;
   }
 
-  // สลับหน้าจอแสดงผล
   if (dashboardBox) dashboardBox.style.display = 'none';
   if (contentBox) contentBox.style.display = 'block';
 }
 
-// 3. ฟังก์ชันย้อนกลับไปหน้าหลัก (Dashboard)
+// 6. ฟังก์ชันย้อนกลับหน้าหลัก
 function backToDashboard() {
   const dashboardBox = document.getElementById('dashboard-box');
   const contentBox = document.getElementById('content-box');
@@ -49,20 +104,5 @@ function backToDashboard() {
 
   if (contentBox) contentBox.style.display = 'none';
   if (dashboardBox) dashboardBox.style.display = 'block';
-  
-  // เคลียร์พื้นที่แสดง PDF ออกเมื่อย้อนกลับ
   if (pdfContainer) pdfContainer.innerHTML = '';
-}
-
-// 4. ตัวอย่างฟังก์ชันสร้างการ์ดไฟล์ใน #file-grid (เรียกใช้เมื่อโหลดหน้าเว็บ)
-function renderFileCards(fileList) {
-  const fileGrid = document.getElementById('file-grid');
-  if (!fileGrid) return;
-
-  fileGrid.innerHTML = fileList.map(item => `
-    <div class="card" onclick="openPdf('${item.title}', '${item.url}')" style="cursor: pointer;">
-      <h3>${item.title}</h3>
-      <p>คลิกเพื่ออ่านเฉลย</p>
-    </div>
-  `).join('');
 }
