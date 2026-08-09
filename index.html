@@ -3,102 +3,366 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My KeySpace - คลังเฉลยเอกสาร</title>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <!-- Supabase JS (แก้ไขลิงก์เรียบร้อย) -->
+  <title>My KeySpace</title>
+  
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- PDF.js -->
+
+  <!-- PDF.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ธีมปกติ (Light Mode ตั้งต้น) */
+    :root {
+      --bg-color: #FDFBF7;
+      --card-bg: #FFFFFF;
+      --text-color: #4A3E3D;
+      --sub-text: #8E756C;
+      --border: #E8DFD8;
+      --input-bg: #FFFFFF;
+      --primary: #E2A99B;
+      --primary-dark: #C88675;
+      --shadow: rgba(0, 0, 0, 0.05);
+    }
+
+    /* ธีมมืด (Dark Mode) */
+    body.dark-mode {
+      --bg-color: #121212;
+      --card-bg: #1E1E1E;
+      --text-color: #E0E0E0;
+      --sub-text: #A0A0A0;
+      --border: #333333;
+      --input-bg: #2C2C2C;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', 'Itim', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      position: relative;
+    }
+
+    /* แถบด้านบน (Header Top Bar) */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: var(--card-bg);
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 10px var(--shadow);
+    }
+
+    .badge-status {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: var(--border);
+      color: var(--sub-text);
+      white-space: nowrap;
+    }
+
+    .badge-online {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    body.dark-mode .badge-online {
+      background: #1B381E;
+      color: #81C784;
+    }
+
+    .btn-theme {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      outline: none;
+    }
+
+    .btn-theme:hover {
+      border-color: var(--primary);
+    }
+
+    /* เมนู 3 ขีด */
+    .menu-container {
+      position: relative;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--text-color);
+      padding: 0 4px;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 35px;
+      background-color: var(--card-bg);
+      min-width: 160px;
+      box-shadow: 0px 8px 16px var(--shadow);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: var(--text-color);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--border);
+    }
+
+    /* การ์ดและกล่องเนื้อหา */
+    .box-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 15px var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .title-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title-header h1 {
+      font-size: 24px;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+    }
+
+    .title-header p {
+      font-size: 14px;
+      color: var(--sub-text);
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-color);
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(226, 169, 155, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-back {
+      background: var(--sub-text);
+      margin-bottom: 15px;
+      width: auto;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .error-msg {
+      color: #d9534f;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* กริดรายการไฟล์ */
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .file-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .file-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .file-card h3 {
+      font-size: 15px;
+      color: var(--text-color);
+      margin-bottom: 4px;
+    }
+
+    .file-card p {
+      font-size: 12px;
+      color: var(--sub-text);
+      margin-bottom: 10px;
+    }
+
+    .btn-open {
+      font-size: 12px;
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Navbar / Header -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <div class="logo">
-        <span class="logo-icon">🔑</span>
-        <span class="logo-text">My KeySpace</span>
-      </div>
-<button id="theme-btn" onclick="toggleTheme()" class="btn-theme" style="padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-color); cursor: pointer;">
-  🌙 โหมดมืด
-</button>
-      <div class="nav-right">
-        <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
-        <div class="dropdown">
-          <button class="menu-btn" onclick="toggleMenu()">☰</button>
-          <div id="dropdown-menu" class="dropdown-content">
-            <a href="#" onclick="showRules(); return false;">⚠️ กฎการใช้งาน</a>
-            <a href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
-            <a href="#" id="menu-logout" onclick="logout(); return false;" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
-          </div>
+  <div class="container">
+
+    <!-- แถบเมนูด้านบน (Status + Theme Switcher + Menu) -->
+    <div class="top-bar">
+      <!-- 1. สถานะเข้าสู่ระบบ -->
+      <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
+
+      <!-- 2. ปุ่มเปลี่ยนโหมดมืด/สว่าง (อยู่ตรงกลาง) -->
+      <button id="theme-btn" onclick="toggleTheme()" class="btn-theme">
+        🌙
+      </button>
+
+      <!-- 3. เมนูขีด 3 ขีด -->
+      <div class="menu-container">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div id="dropdown-menu" class="dropdown-content">
+          <a href="#" onclick="showRules()">📜 กฎการใช้งาน</a>
+          <a href="#" id="menu-logout" onclick="logout()" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
         </div>
       </div>
     </div>
-  </nav>
 
-  <main class="container">
-
-    <!-- 1. หน้าต่างเข้าสู่ระบบ (Login Box) -->
-    <div id="login-box" class="card-box">
-      <h2>🔐 เข้าสู่ระบบ</h2>
-      <p class="subtitle">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าสู่ระบบ</p>
-
-      <div class="form-group">
-        <label for="username">ชื่อผู้ใช้ (Username)</label>
-        <input type="text" id="username" autocomplete="off">
+    <!-- 1. หน้าล็อกอิน (Login Box) -->
+    <div id="login-box" class="box-card">
+      <div class="title-header">
+        <h1>📚 My KeySpace</h1>
+        <p>ยินดีต้อนรับสู่คลังเอกสาร กรุณาเข้าสู่ระบบ</p>
       </div>
 
-      <div class="form-group">
-        <label for="access-code">รหัสผ่าน (Password)</label>
-        <input type="password" id="access-code">
+      <div class="input-group">
+        <label for="username">ชื่อผู้ใช้งาน (Username):</label>
+        <input type="text" id="username" placeholder="กรอก Username ของคุณ">
       </div>
 
-      <p id="error-msg" class="error-text" style="display: none;"></p>
+      <div class="input-group">
+        <label for="access-code">รหัสผ่าน (Access Code):</label>
+        <input type="password" id="access-code" placeholder="กรอกรหัสผ่านเข้าใช้งาน">
+      </div>
 
-      <button class="btn-primary" onclick="checkAccess()">เข้าสู่ระบบ</button>
+      <button class="btn" onclick="checkAccess()">เข้าสู่ระบบ</button>
+      <div id="error-msg" class="error-msg"></div>
     </div>
 
-    <!-- 2. หน้าหลักคลังไฟล์ (Dashboard Box) -->
-    <div id="dashboard-box" class="card-box" style="display: none;">
-      <div class="dashboard-header">
-        <div>
-          <h2>📚 คลังเฉลยของคุณ <span id="user-display-name" class="user-highlight"></span></h2>
-          <p class="subtitle">เลือกวิชาที่ต้องการเปิดอ่านได้เลยน้า</p>
-        </div>
+    <!-- 2. หน้าหลักผู้ใช้ (Dashboard Box) -->
+    <div id="dashboard-box" class="box-card" style="display: none;">
+      <div class="title-header">
+        <h2>👋 ยินดีต้อนรับคุณ <span id="user-display-name" style="color: var(--primary-dark);"></span></h2>
+        <p>เลือกรายการเอกสารเฉลยที่คุณมีสิทธิ์อ่านได้ด้านล่างนี้</p>
       </div>
 
       <!-- ช่องค้นหาไฟล์ -->
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" oninput="filterFiles()">
+      <div class="input-group">
+        <input type="text" id="search-input" placeholder="🔍 ค้นหาชื่อไฟล์เฉลย..." oninput="filterFiles()">
       </div>
 
-      <!-- ตารางแสดงการ์ดไฟล์ -->
+      <!-- รายการไฟล์ PDF -->
       <div id="file-grid" class="file-grid">
-        <!-- Javascript จะดึงไฟล์มาแสดงตรงนี้ -->
+        <!-- การ์ดไฟล์จะถูกดึงมาแสดงด้วย JavaScript -->
       </div>
     </div>
 
-    <!-- 3. หน้าเปิดอ่านเอกสาร PDF (Content Box) -->
-    <div id="content-box" class="card-box" style="display: none;">
-      <div class="content-header">
-        <button class="btn-back" onclick="backToDashboard()">←</button>
-        <h2 id="pdf-title">ชื่อไฟล์เฉลย</h2>
-      </div>
-
-      <!-- คอนเทนเนอร์สำหรับวาด Canvas PDF -->
-      <div id="pdf-container" class="pdf-container">
-        <!-- PDF pages rendered here -->
-      </div>
+    <!-- 3. หน้าอ่าน PDF (Content Box) -->
+    <div id="content-box" class="box-card" style="display: none;">
+      <button class="btn btn-back" onclick="backToDashboard()">←</button>
+      <h2 id="pdf-title" style="margin-bottom: 15px; color: var(--primary-dark);"></h2>
+      <div id="pdf-container"></div>
     </div>
 
-  </main>
+  </div>
 
+  <!-- เรียกใช้งานไฟล์ script.js หลัก -->
   <script src="script.js"></script>
 </body>
 </html>
