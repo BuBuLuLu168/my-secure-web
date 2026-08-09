@@ -24,7 +24,9 @@
         <span class="logo-icon">🔑</span>
         <span class="logo-text">My KeySpace</span>
       </div>
-
+<button id="theme-btn" onclick="toggleTheme()" class="btn-theme" style="padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-color); cursor: pointer;">
+  🌙 โหมดมืด
+</button>
       <div class="nav-right">
         <span id="status-badge" class="badge-status">🔒 ยังไม่ได้เข้าสู่ระบบ</span>
         <div class="dropdown">
@@ -33,9 +35,6 @@
             <a href="#" onclick="showRules(); return false;">⚠️ กฎการใช้งาน</a>
             <a href="https://line.me" target="_blank">💬 ติดต่อแอดมิน</a>
             <a href="#" id="menu-logout" onclick="logout(); return false;" style="display: none; color: #d9534f;">🚪 ออกจากระบบ</a>
-            <button id="theme-btn" onclick="toggleTheme()" class="btn-theme" style="padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-color); cursor: pointer;">
-  🌙 โหมดมืด
-</button>
           </div>
         </div>
       </div>
