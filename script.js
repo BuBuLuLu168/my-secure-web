@@ -4,7 +4,7 @@
 
 // 1. เชื่อมต่อ Supabase (ใส่ Anon Key ของคุณตรงช่องล่างนี้)
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
-const SUPABASE_ANON_KEY = "ใส่_ANON_KEY_เดิมของคุณที่นี่"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvc2JneWxmdmVua3Blc3h4cmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNjUxMTUsImV4cCI6MjEwMTc0MTExNX0.HR0-QGkRjmpl_ongm4lwde5eNVn-tRF1TtSQ_Ovdk1w"; 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 2. ฟังก์ชันแปลง URL ป้องกันไฟล์เก่าติด Cache
