@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เช็ครหัสผ่านเข้าใช้งาน - My KeySpace</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #E2A99B;
+      --primary-dark: #C88675;
+      --bg-color: #FDFBF7;
+      --card-bg: #FFFFFF;
+      --text-color: #4A3E3D;
+      --sub-text: #8E756C;
+      --border: #E8DFD8;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --card-bg: #1E1E1E;
+      --text-color: #E0E0E0;
+      --sub-text: #A0A0A0;
+      --border: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', 'Itim', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 22px;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--sub-text);
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(226, 169, 155, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .result-box {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      background: #FFF5F2;
+      border: 1.5px dashed var(--primary);
+      border-radius: 14px;
+    }
+
+    body.dark-mode .result-box {
+      background: #2A2220;
+    }
+
+    .code-display {
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--primary-dark);
+      letter-spacing: 2px;
+      margin: 10px 0;
+      word-break: break-all;
+    }
+
+    .btn-copy {
+      background: var(--sub-text);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-go-web {
+      display: inline-block;
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .error-text {
+      color: #d9534f;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="icon">🔍</div>
+      <h1>เช็ครหัสผ่านเข้าใช้งาน</h1>
+      <p>กรอก Username ของคุณ เพื่อดึงรหัสผ่านเข้าอ่านเอกสาร</p>
+
+      <div class="input-group">
+        <label for="search-user">ชื่อผู้ใช้ (Username):</label>
+        <input type="text" id="search-user" placeholder="กรอก Username ของคุณ... ">
+      </div>
+
+      <button class="btn" onclick="lookupPasscode()">ค้นหารหัสผ่าน</button>
+      <div id="error-msg" class="error-text"></div>
+
+      <div id="result-box" class="result-box">
+        <p style="margin-bottom: 4px; font-size: 13px;">รหัสผ่านของคุณคือ:</p>
+        <div id="passcode-display" class="code-display">------</div>
+        <button class="btn-copy" onclick="copyCode()">📋 คัดลอกรหัสผ่าน</button>
+        <a href="index.html" class="btn-go-web">🚀 ไปหน้าเข้าสู่ระบบทันที</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    if (localStorage.getItem("user_theme") === "dark") {
+      document.body.classList.add("dark-mode");
+    }
+
+    async function lookupPasscode() {
+      const user = document.getElementById("search-user").value.trim();
+      const errorMsg = document.getElementById("error-msg");
+      const resultBox = document.getElementById("result-box");
+      const passcodeDisplay = document.getElementById("passcode-display");
+
+      errorMsg.style.display = "none";
+      resultBox.style.display = "none";
+
+      if (!user) {
+        errorMsg.innerText = "กรุณากรอก Username ของคุณ";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      const { data, error } = await _supabase
+        .from('user_access_codes')
+        .select('access_code')
+        .ilike('username', user)
+        .maybeSingle();
+
+      if (error || !data) {
+        errorMsg.innerText = "❌ ไม่พบชื่อผู้ใช้นี้ในระบบ กรุณาตรวจสอบหรือติดต่อแอดมิน";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      passcodeDisplay.innerText = data.access_code;
+      resultBox.style.display = "block";
+    }
+
+    function copyCode() {
+      const code = document.getElementById("passcode-display").innerText;
+      navigator.clipboard.writeText(code);
+      alert("📋 คัดลอกรหัสผ่านเรียบร้อยแล้ว!");
+    }
+  </script>
+</body>
+</html>
