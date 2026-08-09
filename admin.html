@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจัดการสิทธิ์ผู้ใช้งาน (Admin Panel) - My KeySpace</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #E2A99B;
+      --primary-dark: #C88675;
+      --bg-color: #FDFBF7;
+      --card-bg: #FFFFFF;
+      --text-color: #4A3E3D;
+      --sub-text: #8E756C;
+      --border: #E8DFD8;
+      --success: #28a745;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', 'Itim', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+    }
+
+    .header-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header-card h1 {
+      font-size: 22px;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+    }
+
+    .header-card p {
+      font-size: 14px;
+      color: var(--sub-text);
+    }
+
+    /* Admin PIN Overlay */
+    #pin-box {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-color);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      background: #FFF;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(226, 169, 155, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #8E756C;
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: #6c5850;
+    }
+
+    /* Admin Panel Main Content */
+    #admin-content {
+      display: none;
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #f8f5f2;
+      color: var(--text-color);
+    }
+
+    .btn-sm:hover {
+      background: var(--border);
+    }
+
+    /* Checklist Grid */
+    .file-checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 350px;
+      overflow-y: auto;
+      padding-right: 5px;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #FFFBF9;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .checkbox-item:hover {
+      border-color: var(--primary);
+      background: #FFF5F2;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: var(--primary-dark);
+    }
+
+    .checkbox-item span {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .status-msg {
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .status-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .badge-count {
+      background: var(--primary-dark);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="header-card">
+      <h1>🛠️ ระบบจัดการสิทธิ์เข้าถึงเอกสาร (Admin Panel)</h1>
+      <p>เลือกชื่อลูกค้า และติ๊กเลือกไฟล์ที่ต้องการมอบสิทธิ์ได้ทันที</p>
+    </div>
+
+    <!-- 1. หน้ากรอก PIN เข้าสู่ระบบ Admin (ป้องกันคนนอกเข้าเล่น) -->
+    <div id="pin-box">
+      <div class="input-group">
+        <label for="admin-pin">🔑 ใส่รหัส Admin เพื่อเข้าใช้งาน:</label>
+        <input type="password" id="admin-pin" placeholder="กรอกรหัส Admin PIN (ตั้งต้นคือ 2537)">
+      </div>
+      <button class="btn" onclick="unlockAdmin()">เข้าสู่ระบบจัดการ</button>
+      <div id="pin-error" class="status-msg status-error">รหัส Admin PIN ไม่ถูกต้อง!</div>
+    </div>
+
+    <!-- 2. ส่วนจัดการสิทธิ์ (จะแสดงเมื่อใส่ PIN ถูกต้อง) -->
+    <div id="admin-content">
+      <div class="panel-card">
+        
+        <!-- เลือก หรือ พิมพ์ชื่อลูกค้า -->
+        <div class="input-group">
+          <label for="user-select">👤 เลือกชื่อผู้ใช้ (ลูกค้า):</label>
+          <select id="user-select" onchange="onUserSelected()">
+            <option value="">-- กำลังโหลดรายชื่อลูกค้า... --</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="custom-username">หรือ พิมพ์ชื่อผู้ใช้ใหม่เอง:</label>
+          <input type="text" id="custom-username" placeholder="พิมพ์ Username เช่น user123" oninput="onCustomUserTyped()">
+        </div>
+
+      </div>
+
+      <!-- รายการไฟล์สำหรับกดติ๊กสิทธิ์ -->
+      <div class="panel-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 16px;">📂 รายการไฟล์ในระบบ <span id="file-count" class="badge-count">0</span></h3>
+          <div class="quick-actions">
+            <button class="btn-sm" onclick="selectAllFiles(true)">ติ๊กเลือกทั้งหมด</button>
+            <button class="btn-sm" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
+          </div>
+        </div>
+
+        <div id="file-checkbox-container" class="file-checkbox-list">
+          <p style="text-align: center; color: var(--sub-text); padding: 20px;">⏳ กำลังโหลดรายการไฟล์ทั้งหมด...</p>
+        </div>
+
+        <button class="btn" onclick="savePermissions()">💾 บันทึกสิทธิ์การเข้าถึงไฟล์</button>
+        <div id="save-status" class="status-msg"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Config Supabase
+    const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_zMaubla_jbQ-EnJjFOyYQw_e_9FhBaw";
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // รหัส Admin PIN ตั้งต้น (คุณสามารถเปลี่ยนตรงนี้เป็นรหัสที่คุณชอบได้)
+    const ADMIN_PIN = "2537";
+
+    let allFiles = [];
+    let selectedUser = "";
+
+    // ยืนยันรหัส Admin
+    function unlockAdmin() {
+      const inputPin = document.getElementById("admin-pin").value;
+      const errorMsg = document.getElementById("pin-error");
+
+      if (inputPin === ADMIN_PIN) {
+        document.getElementById("pin-box").style.display = "none";
+        document.getElementById("admin-content").style.display = "block";
+        initAdminPanel();
+      } else {
+        errorMsg.style.display = "block";
+      }
+    }
+
+    // โหลดข้อมูลเริ่มต้นเมื่อล็อกอินผ่าน
+    async function initAdminPanel() {
+      await fetchUsersList();
+      await fetchAllFiles();
+    }
+
+    // 1. ดึงรายชื่อลูกค้าทั้งหมดจากตาราง user_access_codes
+    async function fetchUsersList() {
+      const userSelect = document.getElementById("user-select");
+      
+      const { data: users, error } = await _supabase
+        .from('user_access_codes')
+        .select('username')
+        .order('username', { ascending: true });
+
+      if (error || !users || users.length === 0) {
+        userSelect.innerHTML = `<option value="">-- ไม่พบรายชื่อ หรือพิมพ์เองด้านล่าง --</option>`;
+        return;
+      }
+
+      userSelect.innerHTML = `<option value="">-- เลือกชื่อผู้ใช้จากระบบ --</option>` + 
+        users.map(u => `<option value="${u.username}">${u.username}</option>`).join('');
+    }
+
+    // 2. ดึงไฟล์ PDF ทั้งหมดจาก Supabase Storage (pdf-files)
+    async function fetchAllFiles() {
+      const container = document.getElementById("file-checkbox-container");
+      
+      const { data: files, error } = await _supabase.storage.from('pdf-files').list();
+
+      if (error || !files || files.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#d9534f;">ไม่พบไฟล์ PDF ใน Storage</p>`;
+        return;
+      }
+
+      // กรองเฉพาะไฟล์ PDF (ไม่เอาโฟลเดอร์หรือไฟล์ซ่อน)
+      allFiles = files.filter(f => !f.name.startsWith('.') && f.name.endsWith('.pdf'));
+      document.getElementById("file-count").innerText = allFiles.length;
+
+      renderFileCheckboxes([]);
+    }
+
+    // แสดงผล Checkbox สำหรับไฟล์
+    function renderFileCheckboxes(allowedFiles) {
+      const container = document.getElementById("file-checkbox-container");
+      
+      if (allFiles.length === 0) {
+        container.innerHTML = `<p style="text-align:center;">ไม่มีไฟล์</p>`;
+        return;
+      }
+
+      container.innerHTML = allFiles.map(file => {
+        const isChecked = allowedFiles.includes(file.name) ? 'checked' : '';
+        return `
+          <label class="checkbox-item">
+            <input type="checkbox" value="${file.name}" class="file-chk" ${isChecked}>
+            <span>📄 ${file.name}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    // เมื่อเลือกผู้ใช้จาก Dropdown
+    async function onUserSelected() {
+      const userSelect = document.getElementById("user-select");
+      selectedUser = userSelect.value;
+      document.getElementById("custom-username").value = "";
+
+      if (selectedUser) {
+        await loadUserPermissions(selectedUser);
+      } else {
+        renderFileCheckboxes([]);
+      }
+    }
+
+    // เมื่อพิมพ์ชื่อผู้ใช้เอง
+    async function onCustomUserTyped() {
+      const customInput = document.getElementById("custom-username");
+      selectedUser = customInput.value.trim();
+      document.getElementById("user-select").value = "";
+
+      if (selectedUser) {
+        await loadUserPermissions(selectedUser);
+      } else {
+        renderFileCheckboxes([]);
+      }
+    }
+
+    // โหลดสิทธิ์เดิมของลูกค้าคนนี้ว่ามีไฟล์ไหนอยู่แล้วบ้าง
+    async function loadUserPermissions(username) {
+      const { data: userPerms, error } = await _supabase
+        .from('user_permissions')
+        .select('file_name')
+        .ilike('username', username);
+
+      if (error || !userPerms) {
+        renderFileCheckboxes([]);
+        return;
+      }
+
+      const allowedFiles = userPerms.map(p => p.file_name);
+      renderFileCheckboxes(allowedFiles);
+    }
+
+    // ปุ่ม ติ๊กเลือกทั้งหมด / ยกเลิกทั้งหมด
+    function selectAllFiles(shouldSelect) {
+      const checkboxes = document.querySelectorAll('.file-chk');
+      checkboxes.forEach(chk => chk.checked = shouldSelect);
+    }
+
+    // 💾 บันทึกสิทธิ์ลง Supabase
+    async function savePermissions() {
+      const statusBox = document.getElementById("save-status");
+      statusBox.style.display = "none";
+
+      if (!selectedUser) {
+        statusBox.className = "status-msg status-error";
+        statusBox.innerText = "❌ กรุณาเลือกหรือพิมพ์ชื่อผู้ใช้ก่อนน้า!";
+        statusBox.style.display = "block";
+        return;
+      }
+
+      // ดึงรายชื่อไฟล์ที่ถูกติ๊กถูก
+      const checkedBoxes = document.querySelectorAll('.file-chk:checked');
+      const selectedFiles = Array.from(checkedBoxes).map(chk => chk.value);
+
+      statusBox.className = "status-msg";
+      statusBox.style.background = "#fff3cd";
+      statusBox.style.color = "#856404";
+      statusBox.innerText = "⏳ กำลังบันทึกข้อมูลสิทธิ์...";
+      statusBox.style.display = "block";
+
+      try {
+        // 1. ลบสิทธิ์เดิมทั้งหมดของลูกค้ารายนี้ก่อน
+        await _supabase
+          .from('user_permissions')
+          .delete()
+          .ilike('username', selectedUser);
+
+        // 2. ถ้ามีไฟล์ถูกติ๊ก ให้ทำการเพิ่มรายการใหม่ลงตาราง user_permissions
+        if (selectedFiles.length > 0) {
+          const insertData = selectedFiles.map(fileName => ({
+            username: selectedUser,
+            file_name: fileName
+          }));
+
+          const { error: insertError } = await _supabase
+            .from('user_permissions')
+            .insert(insertData);
+
+          if (insertError) throw insertError;
+        }
+
+        statusBox.className = "status-msg status-success";
+        statusBox.innerText = `✅ บันทึกสิทธิ์ให้ "${selectedUser}" เรียบร้อยแล้ว! (${selectedFiles.length} ไฟล์)`;
+      } catch (err) {
+        statusBox.className = "status-msg status-error";
+        statusBox.innerText = "❌ เกิดข้อผิดพลาดในการบันทึก: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
