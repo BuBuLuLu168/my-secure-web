@@ -38,6 +38,7 @@ input, select {
   color: var(--text-color) !important;
   border-color: var(--border) !important;
 }
+
 /* Custom CSS - My KeySpace Cream & Peach Pastel Theme */
 * {
   box-sizing: border-box;
@@ -177,6 +178,8 @@ h2 {
   font-weight: 600;
   font-size: 22px;
   margin-bottom: 6px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .subtitle {
@@ -293,6 +296,7 @@ h2 {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  overflow: hidden; /* ป้องกันเนื้อหาทะลุ */
 }
 
 .file-card:hover {
@@ -306,17 +310,23 @@ h2 {
   margin-bottom: 10px;
 }
 
+/* แก้ไขจุดตัวอักษรทะลุกรอบ */
 .file-card h3 {
   font-size: 15px;
   color: #4A3E3D;
   margin-bottom: 6px;
+  white-space: normal;
   word-break: break-word;
+  overflow-wrap: anywhere; /* บังคับตัดบรรทัดเมื่อคำยาวเกิน */
+  line-height: 1.4;
 }
 
 .file-card p {
   font-size: 12px;
   color: #A08C85;
   margin-bottom: 12px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .btn-open {
