@@ -1,5 +1,5 @@
 // ==========================================
-// My KeySpace - Main Script
+// My KeySpace - Main Script (With Audit Log)
 // ==========================================
 
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
@@ -11,6 +11,23 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let currentLoggedInUser = "";
+
+// ------------------------------------------
+// System: ฟังก์ชันบันทึกประวัติใช้งาน (Audit Log)
+// ------------------------------------------
+async function logUserActivity(username, action, details = "") {
+  try {
+    await _supabase.from('user_logs').insert([
+      {
+        username: username || 'Guest',
+        action: action,
+        details: details
+      }
+    ]);
+  } catch (err) {
+    console.error("Failed to save log:", err);
+  }
+}
 
 // ------------------------------------------
 // 0. ระบบสลับโหมดมืด / โหมดสว่าง
@@ -67,7 +84,7 @@ function showRules() {
 }
 
 // ------------------------------------------
-// 2. ระบบเข้าสู่ระบบ
+// 2. ระบบเข้าสู่ระบบ + บันทึก Log
 // ------------------------------------------
 
 async function checkAccess() {
@@ -90,6 +107,9 @@ async function checkAccess() {
   if (error || !data || data.length === 0) {
     errorMsg.innerText = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องน้า!";
     errorMsg.style.display = "block";
+    
+    // 📝 Log: บันทึกว่ามีคนพยายามเข้าสู่ระบบแต่ใส่รหัสผิด
+    logUserActivity(user, 'LOGIN_FAILED', 'กรอกชื่อผู้ใช้หรือรหัสผ่านผิด');
     return;
   }
 
@@ -104,6 +124,9 @@ async function checkAccess() {
   
   document.getElementById("menu-logout").style.display = "block";
   document.getElementById("user-display-name").innerText = currentLoggedInUser;
+
+  // 📝 Log: บันทึกการเข้าสู่ระบบสำเร็จ
+  logUserActivity(currentLoggedInUser, 'LOGIN_SUCCESS', 'เข้าสู่ระบบสำเร็จ');
 
   loadFileList();
 }
@@ -192,13 +215,16 @@ function filterFiles() {
 }
 
 // ------------------------------------------
-// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล
+// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล + บันทึก Log
 // ------------------------------------------
 
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
+
+  // 📝 Log: บันทึกว่าเปิดดูไฟล์ไหน
+  logUserActivity(currentLoggedInUser, 'VIEW_PDF', `เปิดอ่านไฟล์: ${fileName}`);
 
   const container = document.getElementById("pdf-container");
   container.innerHTML = "<p style='text-align:center; color:var(--sub-text); font-size:18px; padding:20px;'>⏳ กำลังโหลดเอกสาร...</p>";
@@ -265,6 +291,11 @@ function backToDashboard() {
 }
 
 function logout() {
+  // 📝 Log: บันทึกการออกจากระบบ
+  if (currentLoggedInUser) {
+    logUserActivity(currentLoggedInUser, 'LOGOUT', 'ออกจากระบบ');
+  }
+
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "none";
   document.getElementById("login-box").style.display = "block";
@@ -278,6 +309,7 @@ function logout() {
   document.getElementById("access-code").value = "";
   document.getElementById("search-input").value = "";
   document.getElementById("pdf-container").innerHTML = "";
+  currentLoggedInUser = "";
 }
 
 // ------------------------------------------
