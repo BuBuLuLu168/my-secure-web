@@ -8,10 +8,10 @@
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- jsQR CDN (สำหรับสแกน QR Code) -->
+  <!-- jsQR CDN -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
-  <!-- Tesseract.js CDN (สำหรับอ่านข้อความภาษาไทย/อังกฤษ) -->
+  <!-- Tesseract.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <!-- Google Fonts -->
@@ -62,7 +62,7 @@
 
     .container {
       width: 100%;
-      max-width: 680px;
+      max-width: 720px;
     }
 
     .theme-toggle-container {
@@ -185,12 +185,6 @@
       background: var(--item-hover);
     }
 
-    .dropzone p {
-      font-size: 13px;
-      color: var(--sub-text);
-      margin-top: 6px;
-    }
-
     .file-checkbox-list {
       display: flex;
       flex-direction: column;
@@ -211,11 +205,6 @@
       cursor: pointer;
     }
 
-    .checkbox-item:hover {
-      border-color: var(--primary);
-      background: var(--item-hover);
-    }
-
     .checkbox-item input[type="checkbox"] {
       width: 18px;
       height: 18px;
@@ -225,7 +214,7 @@
     }
 
     .user-table-wrapper {
-      max-height: 220px;
+      max-height: 250px;
       overflow-y: auto;
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -260,6 +249,23 @@
 
     .status-success { background: #1b4327; color: #d4edda; }
     .status-error { background: #491217; color: #f8d7da; }
+
+    .btn-action {
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--item-bg);
+      color: var(--text-color);
+      margin-right: 4px;
+    }
+    
+    .btn-action-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -345,8 +351,8 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <label style="font-size: 13px; font-weight: 600;">เลือกไฟล์ที่สิทธิ์อ่านได้ (<span id="file-count">0</span>):</label>
           <div>
-            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border); background: var(--item-bg); color: var(--text-color);" onclick="selectAllFiles(true)">เลือกทั้งหมด</button>
-            <button style="padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border); background: var(--item-bg); color: var(--text-color);" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
+            <button class="btn-action" onclick="selectAllFiles(true)">เลือกทั้งหมด</button>
+            <button class="btn-action" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
           </div>
         </div>
 
@@ -482,7 +488,7 @@
       }
     }
 
-    // --- ระบบสแกนสลิปโอนเงิน (ดึงชื่อคนโอน + 4 ตัวอักษรท้ายสุดของเลขรายการ) ---
+    // --- ระบบสแกนสลิปโอนเงิน ---
     async function handleSlipUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -500,7 +506,6 @@
       img.src = URL.createObjectURL(file);
 
       img.onload = async () => {
-        // 1. สแกน QR Code หา 4 ตัวอักษรท้ายสุดของรหัสใน QR Code
         try {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
@@ -513,22 +518,19 @@
           if (qrCode && qrCode.data) {
             const cleanQr = qrCode.data.trim();
             if (cleanQr.length >= 4) {
-              foundPasscode = cleanQr.slice(-4); // เอา 4 ตัวท้ายสุดโดยไม่ตัดประเภทตัวอักษร
+              foundPasscode = cleanQr.slice(-4);
             }
           }
         } catch (e) {
           console.log("QR Code error:", e);
         }
 
-        // 2. อ่านข้อความสลิปด้วย Tesseract OCR
         try {
           const worker = await Tesseract.createWorker('tha+eng');
           const ret = await worker.recognize(file);
           await worker.terminate();
 
           const rawText = ret.data.text;
-
-          // --- 2.1 ดึงชื่อผู้โอน (ตัดเอาเฉพาะโซนคนโอนข้างบน + เอาเฉพาะชื่อหน้า) ---
           let senderText = rawText;
           const toIndex = rawText.search(/(ไปยัง|โอนไปยัง|To\b|ผู้รับเงิน|เข้าบัญชี)/i);
           if (toIndex !== -1) {
@@ -557,16 +559,11 @@
             }
           }
 
-          // --- 2.2 ดึง 4 ตัวท้ายสุดจากช่อง "เลขที่ทำรายการ/รหัสอ้างอิง" (นับรวมตัวอักษรภาษาไทย/อังกฤษ) ---
           if (!foundPasscode) {
             const txMatch = rawText.match(/(?:เลขที่ทำรายการ|เลขที่รายการ|รหัสอ้างอิง|เลขที่อ้างอิง|Ref\.?\s*No\.?|Txn\s*ID)[\s:-]*([A-Za-z0-9ก-๙\-_]+)/i);
             if (txMatch && txMatch[1]) {
               const txStr = txMatch[1].trim();
-              if (txStr.length >= 4) {
-                foundPasscode = txStr.slice(-4); // เอา 4 ตัวท้ายสุดตรงๆ ไม่ตัดภาษาไทย/อังกฤษออก
-              } else {
-                foundPasscode = txStr;
-              }
+              foundPasscode = txStr.length >= 4 ? txStr.slice(-4) : txStr;
             }
           }
 
@@ -574,7 +571,6 @@
           console.log("OCR Error:", err);
         }
 
-        // ใส่ค่าลงในช่อง Username และ Passcode
         if (foundUsername) document.getElementById("new-username").value = foundUsername;
         if (foundPasscode) document.getElementById("new-passcode").value = foundPasscode;
 
@@ -645,7 +641,7 @@
           <td><b>${u.username}</b></td>
           <td><code>${u.access_code}</code></td>
           <td>
-            <button style="padding: 2px 8px; font-size:11px; cursor:pointer; border-radius:4px; border:1px solid var(--border); background:var(--item-bg); color:var(--text-color);" onclick="selectUserFromTable('${u.username}')">จัดการสิทธิ์</button>
+            <button class="btn-action btn-action-primary" onclick="selectUserFromTable('${u.username}')">จัดการสิทธิ์</button>
           </td>
         </tr>
       `).join('');
@@ -654,7 +650,7 @@
     function selectUserFromTable(username) {
       document.getElementById("user-select").value = username;
       onUserSelected();
-      window.scrollTo({ top: 300, behavior: 'smooth' });
+      window.scrollTo({ top: 400, behavior: 'smooth' });
     }
 
     async function fetchAllFiles() {
