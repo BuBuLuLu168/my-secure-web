@@ -1,5 +1,6 @@
 // ==========================================
 // My KeySpace - Main Script (Complete Version)
+// Features: Anti-Sharing, Exit Log, Auto-Login, PDF Remember Page, App Switch Blur
 // ==========================================
 
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
@@ -12,6 +13,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 let currentLoggedInUser = "";
 let antiShareInterval = null;
+let currentOpenedPdf = "";
 
 // ------------------------------------------
 // 🛡️ System: สร้าง unique ID สำหรับเครื่องนี้ (Device Token)
@@ -42,7 +44,7 @@ async function logUserActivity(username, action, details = "") {
   }
 }
 
-// 🚪 บันทึก Log เมื่อผู้ใช้ออก/ปิดหน้าเว็บ (แก้ไขใช้ fetch + keepalive ยิงสำเร็จแน่นอนแม้ออกจากเว็บ)
+// 🚪 บันทึก Log เมื่อผู้ใช้ออก/ปิดหน้าเว็บ
 window.addEventListener("pagehide", () => {
   if (currentLoggedInUser) {
     const payload = JSON.stringify({
@@ -65,7 +67,7 @@ window.addEventListener("pagehide", () => {
 });
 
 // ------------------------------------------
-// 0. ระบบสลับโหมดมืด / โหมดสว่าง
+// 0. ระบบสลับโหมดมืด / โหมดสว่าง + Auto Login
 // ------------------------------------------
 function initTheme() {
   const savedTheme = localStorage.getItem("user_theme");
@@ -93,7 +95,19 @@ function toggleTheme() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", initTheme);
+// 🔄 Auto-Login เมื่อโหลดหน้าเว็บ
+document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
+  
+  const savedUser = localStorage.getItem("saved_username");
+  const savedCode = localStorage.getItem("saved_access_code");
+
+  if (savedUser && savedCode) {
+    document.getElementById("username").value = savedUser;
+    document.getElementById("access-code").value = savedCode;
+    checkAccess(true); // pass true for silent/auto login
+  }
+});
 
 // ------------------------------------------
 // 1. ระบบเมนู & แจ้งเตือน
@@ -119,14 +133,16 @@ function showRules() {
 // ------------------------------------------
 // 2. ระบบเข้าสู่ระบบ + Anti-Sharing Check
 // ------------------------------------------
-async function checkAccess() {
+async function checkAccess(isAuto = false) {
   const user = document.getElementById("username").value.trim();
   const code = document.getElementById("access-code").value.trim();
   const errorMsg = document.getElementById("error-msg");
 
   if (!user || !code) {
-    errorMsg.innerText = "กรุณากรอกข้อมูลให้ครบก่อนน้า";
-    errorMsg.style.display = "block";
+    if (!isAuto) {
+      errorMsg.innerText = "กรุณากรอกข้อมูลให้ครบก่อนน้า";
+      errorMsg.style.display = "block";
+    }
     return;
   }
 
@@ -137,16 +153,26 @@ async function checkAccess() {
     .eq('access_code', code);
 
   if (error || !data || data.length === 0) {
-    errorMsg.innerText = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องน้า!";
-    errorMsg.style.display = "block";
-    logUserActivity(user, 'LOGIN_FAILED', 'กรอกชื่อผู้ใช้หรือรหัสผ่านผิด');
+    if (!isAuto) {
+      errorMsg.innerText = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องน้า!";
+      errorMsg.style.display = "block";
+      logUserActivity(user, 'LOGIN_FAILED', 'กรอกชื่อผู้ใช้หรือรหัสผ่านผิด');
+    } else {
+      // ถ้ารหัสที่จำไว้หมดอายุหรือไม่ถูกต้อง ให้ลบออกจากเครื่อง
+      localStorage.removeItem("saved_username");
+      localStorage.removeItem("saved_access_code");
+    }
     return;
   }
 
   currentLoggedInUser = data[0].username;
   const myDeviceToken = getDeviceToken();
 
-  // 🔒 อัปเดต Device Token ล่าสุด เพื่อใช้เช็กว่าล็อกอินซ้อนเครื่องหรือไม่
+  // 🔒 บันทึกความจำการล็อกอินอัตโนมัติ (Remember Me)
+  localStorage.setItem("saved_username", currentLoggedInUser);
+  localStorage.setItem("saved_access_code", code);
+
+  // 🔒 อัปเดต Device Token ล่าสุด
   await _supabase
     .from('user_access_codes')
     .update({ last_device_token: myDeviceToken })
@@ -163,7 +189,7 @@ async function checkAccess() {
   document.getElementById("menu-logout").style.display = "block";
   document.getElementById("user-display-name").innerText = currentLoggedInUser;
 
-  logUserActivity(currentLoggedInUser, 'LOGIN_SUCCESS', 'เข้าสู่ระบบสำเร็จ');
+  logUserActivity(currentLoggedInUser, isAuto ? 'AUTO_LOGIN_SUCCESS' : 'LOGIN_SUCCESS', 'เข้าสู่ระบบสำเร็จ');
 
   loadFileList();
 
@@ -172,7 +198,7 @@ async function checkAccess() {
 }
 
 // ------------------------------------------
-// 🚨 Anti-Sharing Watch (หากมีคนอื่นเข้า รหัสนี้ จะเด้งออกทันที)
+// 🚨 Anti-Sharing Watch
 // ------------------------------------------
 function startAntiSharingWatch(myToken) {
   if (antiShareInterval) clearInterval(antiShareInterval);
@@ -228,10 +254,14 @@ async function loadFileList() {
         card.className = "file-card";
         card.onclick = () => openPdfViewer(file.name, fileUrl);
 
+        // เช็กว่าเคยอ่านค้างไว้หน้าไหนไหม
+        const savedPage = localStorage.getItem(`pdf_pos_${currentLoggedInUser}_${file.name}`);
+        const badgeText = savedPage ? ` 🔖 เลื่อนอ่านต่อ` : '';
+
         card.innerHTML = `
           <div class="card-icon">📄</div>
           <h3>${file.name.replace('.pdf', '')}</h3>
-          <p>ไฟล์ PDF เอกสารเฉลย</p>
+          <p>ไฟล์ PDF เอกสารเฉลย${badgeText}</p>
           <span class="btn-open">เปิดอ่านเนื้อหา →</span>
         `;
         fileGrid.appendChild(card);
@@ -277,9 +307,10 @@ function filterFiles() {
 }
 
 // ------------------------------------------
-// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล (ปรับสบายตา ไม่ลายตา) + บันทึก Log
+// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล + จำตำแหน่งอ่านค้าง
 // ------------------------------------------
 async function openPdfViewer(fileName, fileUrl) {
+  currentOpenedPdf = fileName;
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
@@ -311,6 +342,9 @@ async function openPdfViewer(fileName, fileUrl) {
       canvas.height = viewport.height;
       canvas.width = viewport.width;
       
+      canvas.id = `pdf-canvas-page-${pageNum}`;
+      canvas.className = "pdf-page-canvas";
+      canvas.setAttribute("data-page-num", pageNum);
       canvas.style.width = "100%";
       canvas.style.height = "auto";
       canvas.style.marginBottom = "15px";
@@ -326,7 +360,7 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
-      // 🎨 ปรับลายน้ำ: ขยายระยะห่างเป็น 450px/600px และความเข้มเหลือ 10% (อ่านง่าย สบายตา)
+      // 🎨 ปรับลายน้ำ: ขยายระยะห่างเป็น 450px/600px และความเข้มเหลือ 10%
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
       context.font = "bold 28px 'Itim', sans-serif";
@@ -340,12 +374,29 @@ async function openPdfViewer(fileName, fileUrl) {
       }
       context.restore();
     }
+
+    // 🔖 ระบบเลื่อนไปยังหน้าที่อ่านค้างไว้อัตโนมัติ
+    const savedScrollPos = localStorage.getItem(`pdf_pos_${currentLoggedInUser}_${fileName}`);
+    if (savedScrollPos) {
+      setTimeout(() => {
+        window.scrollTo({ top: parseInt(savedScrollPos), behavior: 'smooth' });
+      }, 300);
+    }
+
   } catch (error) {
     container.innerHTML = "<p style='color:#d9534f;'>ไม่สามารถเปิดไฟล์นี้ได้ กรุณาลองใหม่อีกครั้ง</p>";
   }
 }
 
+// 🔖 บันทึกตำแหน่ง Scroll การอ่าน PDF ค้างไว้
+window.addEventListener("scroll", () => {
+  if (currentOpenedPdf && currentLoggedInUser && document.getElementById("content-box").style.display !== "none") {
+    localStorage.setItem(`pdf_pos_${currentLoggedInUser}_${currentOpenedPdf}`, window.scrollY);
+  }
+});
+
 function backToDashboard() {
+  currentOpenedPdf = "";
   document.getElementById("content-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
   document.getElementById("pdf-container").innerHTML = "";
@@ -355,12 +406,16 @@ function logout() {
   if (currentLoggedInUser) {
     logUserActivity(currentLoggedInUser, 'LOGOUT', 'ออกจากระบบ');
   }
+  // ลบความจำการล็อกอินอัตโนมัติเมื่อกด Logout
+  localStorage.removeItem("saved_username");
+  localStorage.removeItem("saved_access_code");
   logoutSilently();
 }
 
 function logoutSilently() {
   if (antiShareInterval) clearInterval(antiShareInterval);
   currentLoggedInUser = "";
+  currentOpenedPdf = "";
 
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "none";
@@ -399,11 +454,28 @@ window.addEventListener('touchend', (e) => {
 }, { passive: true });
 
 // ------------------------------------------
-// 6. ระบบป้องกันการคัดลอก / ป้องกันแคปหน้าจอ
+// 6. ระบบป้องกันการคัดลอก / เบลอหน้าจอเมื่อสลับแอป
 // ------------------------------------------
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   if (e.key === "PrintScreen" || (e.ctrlKey && (e.key === "p" || e.key === "s")) || e.key === "F12") {
     e.preventDefault();
   }
+});
+
+// 👁️‍🗨️ ปรับหน้าจอให้เบลอทันทีเมื่อลูกค้าสลับแอป หรือสลับแท็บไปที่อื่น
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    document.body.style.filter = "blur(12px)";
+  } else {
+    document.body.style.filter = "none";
+  }
+});
+
+window.addEventListener("blur", () => {
+  document.body.style.filter = "blur(12px)";
+});
+
+window.addEventListener("focus", () => {
+  document.body.style.filter = "none";
 });
