@@ -1,5 +1,5 @@
 // ==========================================
-// My KeySpace - Main Script (With Audit Log)
+// My KeySpace - Main Script (With Anti-Sharing & Exit Log)
 // ==========================================
 
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
@@ -11,9 +11,22 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let currentLoggedInUser = "";
+let antiShareInterval = null;
 
 // ------------------------------------------
-// System: ฟังก์ชันบันทึกประวัติใช้งาน (Audit Log)
+// 🛡️ System: สร้าง unique ID สำหรับเครื่องนี้ (Device Token)
+// ------------------------------------------
+function getDeviceToken() {
+  let token = localStorage.getItem("my_device_token");
+  if (!token) {
+    token = "DEV-" + Math.random().toString(36).substring(2) + Date.now();
+    localStorage.setItem("my_device_token", token);
+  }
+  return token;
+}
+
+// ------------------------------------------
+// 📝 System: ฟังก์ชันบันทึกประวัติใช้งาน (Audit Log)
 // ------------------------------------------
 async function logUserActivity(username, action, details = "") {
   try {
@@ -29,10 +42,16 @@ async function logUserActivity(username, action, details = "") {
   }
 }
 
+// 🚪 บันทึก Log เมื่อผู้ใช้ออก/ปิดหน้าเว็บ หรือสลับแอป
+window.addEventListener("pagehide", () => {
+  if (currentLoggedInUser) {
+    logUserActivity(currentLoggedInUser, 'EXIT_PAGE', 'ปิดหน้าเว็บหรือสลับหน้าจอออก');
+  }
+});
+
 // ------------------------------------------
 // 0. ระบบสลับโหมดมืด / โหมดสว่าง
 // ------------------------------------------
-
 function initTheme() {
   const savedTheme = localStorage.getItem("user_theme");
   const themeBtn = document.getElementById("theme-btn");
@@ -64,7 +83,6 @@ document.addEventListener("DOMContentLoaded", initTheme);
 // ------------------------------------------
 // 1. ระบบเมนู & แจ้งเตือน
 // ------------------------------------------
-
 function toggleMenu() {
   const menu = document.getElementById("dropdown-menu");
   if (menu) menu.classList.toggle("show");
@@ -80,13 +98,12 @@ window.addEventListener("click", (e) => {
 });
 
 function showRules() {
-  alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น");
+  alert("⚠️ กฎการใช้งานคลังเฉลย:\n1. ห้ามคัดลอก แคปหน้าจอ หรือบันทึกไฟล์\n2. ห้ามนำไปเผยแพร่ต่อโดยไม่ได้รับอนุญาต\n3. สิทธิ์ใช้งานเฉพาะผู้ได้รับรหัสผ่านเท่านั้น (ใช้งานได้ครั้งละ 1 อุปกรณ์)");
 }
 
 // ------------------------------------------
-// 2. ระบบเข้าสู่ระบบ + บันทึก Log
+// 2. ระบบเข้าสู่ระบบ + Anti-Sharing Check
 // ------------------------------------------
-
 async function checkAccess() {
   const user = document.getElementById("username").value.trim();
   const code = document.getElementById("access-code").value.trim();
@@ -107,13 +124,19 @@ async function checkAccess() {
   if (error || !data || data.length === 0) {
     errorMsg.innerText = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องน้า!";
     errorMsg.style.display = "block";
-    
-    // 📝 Log: บันทึกว่ามีคนพยายามเข้าสู่ระบบแต่ใส่รหัสผิด
     logUserActivity(user, 'LOGIN_FAILED', 'กรอกชื่อผู้ใช้หรือรหัสผ่านผิด');
     return;
   }
 
   currentLoggedInUser = data[0].username;
+  const myDeviceToken = getDeviceToken();
+
+  // 🔒 อัปเดต Device Token ล่าสุด เพื่อใช้เช็กว่าล็อกอินซ้อนเครื่องหรือไม่
+  await _supabase
+    .from('user_access_codes')
+    .update({ last_device_token: myDeviceToken })
+    .eq('username', currentLoggedInUser);
+
   errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
   document.getElementById("dashboard-box").style.display = "block";
@@ -125,16 +148,40 @@ async function checkAccess() {
   document.getElementById("menu-logout").style.display = "block";
   document.getElementById("user-display-name").innerText = currentLoggedInUser;
 
-  // 📝 Log: บันทึกการเข้าสู่ระบบสำเร็จ
   logUserActivity(currentLoggedInUser, 'LOGIN_SUCCESS', 'เข้าสู่ระบบสำเร็จ');
 
   loadFileList();
+
+  // 🚨 เริ่มทำงาน Anti-Sharing Realtime Check (เช็กทุก 5 วินาที)
+  startAntiSharingWatch(myDeviceToken);
+}
+
+// ------------------------------------------
+// 🚨 Anti-Sharing Watch (หากมีคนอื่นเข้า รหัสนี้ จะเด้งออกทันที)
+// ------------------------------------------
+function startAntiSharingWatch(myToken) {
+  if (antiShareInterval) clearInterval(antiShareInterval);
+
+  antiShareInterval = setInterval(async () => {
+    if (!currentLoggedInUser) return;
+
+    const { data } = await _supabase
+      .from('user_access_codes')
+      .select('last_device_token')
+      .ilike('username', currentLoggedInUser)
+      .single();
+
+    if (data && data.last_device_token && data.last_device_token !== myToken) {
+      clearInterval(antiShareInterval);
+      alert("⚠️ บัญชีนี้ถูกเข้าสู่ระบบจากอุปกรณ์อื่น ระบบทำการออกจากระบบอัตโนมัติค่ะ");
+      logoutSilently();
+    }
+  }, 5000);
 }
 
 // ------------------------------------------
 // 3. ดึงรายการไฟล์เฉพาะที่มีสิทธิ์
 // ------------------------------------------
-
 async function loadFileList() {
   const fileGrid = document.getElementById("file-grid");
   fileGrid.innerHTML = "<p style='text-align:center; color:var(--sub-text); padding:20px;'>⏳ กำลังตรวจสอบสิทธิ์เข้าถึงไฟล์...</p>";
@@ -153,7 +200,7 @@ async function loadFileList() {
   }
 
   const allowedFileNames = userPerms.map(p => p.file_name);
-  const { data: storageFiles, error: storageError } = await _supabase.storage.from('pdf-files').list();
+  const { data: storageFiles } = await _supabase.storage.from('pdf-files').list();
 
   if (storageFiles && storageFiles.length > 0) {
     storageFiles.forEach((file) => {
@@ -217,13 +264,11 @@ function filterFiles() {
 // ------------------------------------------
 // 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล + บันทึก Log
 // ------------------------------------------
-
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "block";
   document.getElementById("pdf-title").innerText = fileName.replace('.pdf', '');
 
-  // 📝 Log: บันทึกว่าเปิดดูไฟล์ไหน
   logUserActivity(currentLoggedInUser, 'VIEW_PDF', `เปิดอ่านไฟล์: ${fileName}`);
 
   const container = document.getElementById("pdf-container");
@@ -291,10 +336,15 @@ function backToDashboard() {
 }
 
 function logout() {
-  // 📝 Log: บันทึกการออกจากระบบ
   if (currentLoggedInUser) {
     logUserActivity(currentLoggedInUser, 'LOGOUT', 'ออกจากระบบ');
   }
+  logoutSilently();
+}
+
+function logoutSilently() {
+  if (antiShareInterval) clearInterval(antiShareInterval);
+  currentLoggedInUser = "";
 
   document.getElementById("dashboard-box").style.display = "none";
   document.getElementById("content-box").style.display = "none";
@@ -309,13 +359,11 @@ function logout() {
   document.getElementById("access-code").value = "";
   document.getElementById("search-input").value = "";
   document.getElementById("pdf-container").innerHTML = "";
-  currentLoggedInUser = "";
 }
 
 // ------------------------------------------
 // 5. ระบบ Pull-to-Refresh มือถือ
 // ------------------------------------------
-
 let touchStartY = 0;
 let touchEndY = 0;
 
@@ -337,7 +385,6 @@ window.addEventListener('touchend', (e) => {
 // ------------------------------------------
 // 6. ระบบป้องกันการคัดลอก / ป้องกันแคปหน้าจอ
 // ------------------------------------------
-
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   if (e.key === "PrintScreen" || (e.ctrlKey && (e.key === "p" || e.key === "s")) || e.key === "F12") {

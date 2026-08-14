@@ -7,13 +7,10 @@
   
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <!-- jsQR CDN -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
   <!-- Tesseract.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
 
@@ -62,7 +59,7 @@
 
     .container {
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
     }
 
     .theme-toggle-container {
@@ -185,22 +182,26 @@
       background: var(--item-hover);
     }
 
-    .file-checkbox-list {
+    .checkbox-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 280px;
+      max-height: 220px;
       overflow-y: auto;
       padding-right: 5px;
       margin-bottom: 15px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: var(--input-bg);
     }
 
     .checkbox-item {
       display: flex;
       align-items: center;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px;
       background: var(--item-bg);
       cursor: pointer;
     }
@@ -278,7 +279,7 @@
     
     <div class="header-card">
       <h1>🛠️ ระบบจัดการหลังบ้าน (Admin Panel)</h1>
-      <p>เพิ่มลูกค้า อัปโหลดไฟล์ PDF และจัดการสิทธิ์อ่านเอกสารครบจบในที่เดียว</p>
+      <p>เพิ่มลูกค้า อัปโหลดไฟล์ PDF และจัดการสิทธิ์อ่านเอกสารแบบกลุ่ม (Bulk Permissions)</p>
     </div>
 
     <!-- กรอก PIN -->
@@ -297,12 +298,10 @@
       <!-- โซนอัปโหลดไฟล์ PDF -->
       <div class="panel-card">
         <h2>📤 อัปโหลดไฟล์ PDF ใหม่เข้าสู่ระบบ</h2>
-        
         <div class="input-group">
           <label for="pdf-upload-input">เลือกไฟล์ PDF จากเครื่องเพื่อนำขึ้นเว็บ:</label>
           <input type="file" id="pdf-upload-input" accept="application/pdf">
         </div>
-
         <button class="btn" onclick="uploadPdfFile()">📤 อัปโหลดไฟล์ขึ้น Storage</button>
         <div id="upload-status" class="status-msg"></div>
       </div>
@@ -310,7 +309,6 @@
       <!-- โซนสแกนสลิปอัตโนมัติ -->
       <div class="panel-card">
         <h2>🧾 สแกนสลิปโอนเงิน</h2>
-        
         <div class="dropzone" onclick="document.getElementById('slip-input').click()">
           <div style="font-size: 32px;">📸</div>
           <strong style="color: var(--primary-dark);">คลิกที่นี่ หรือ ลากรูปสลิปมาวาง</strong>
@@ -322,45 +320,47 @@
       <!-- โซน 1: เพิ่มผู้ใช้ใหม่ -->
       <div class="panel-card">
         <h2>➕ 1. เพิ่มชื่อผู้ใช้และรหัสผ่านใหม่</h2>
-        
         <div class="input-group">
           <label for="new-username">ชื่อผู้ใช้ (Username):</label>
-          <input type="text" id="new-username" placeholder="เช่น somchai">
+          <input type="text" id="new-username">
         </div>
-
         <div class="input-group">
           <label for="new-passcode">รหัสผ่าน (Access Code):</label>
           <input type="text" id="new-passcode">
         </div>
-
         <button class="btn" onclick="createNewUser()">บันทึกเพิ่มลูกค้าใหม่</button>
         <div id="create-user-status" class="status-msg"></div>
       </div>
 
-      <!-- โซน 2: แจกสิทธิ์ -->
+      <!-- โซน 2: จัดการสิทธิ์ทีละหลายคน (Bulk Permissions) -->
       <div class="panel-card">
-        <h2>📂 2. ติ๊กแจกสิทธิ์การเข้าถึงไฟล์ PDF</h2>
+        <h2>👥 2. จัดการสิทธิ์ทีละหลายคน (Bulk Permissions)</h2>
 
-        <div class="input-group">
-          <label for="user-select">เลือกลูกค้าที่ต้องการมอบสิทธิ์:</label>
-          <select id="user-select" onchange="onUserSelected()">
-            <option value="">-- กำลังโหลดรายชื่อ... --</option>
-          </select>
+        <!-- ส่วนเลือกผู้ใช้ -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="font-size: 14px; font-weight: 600;">1) ติ๊กเลือกผู้ใช้ที่ต้องการมอบสิทธิ์ (<span id="user-count">0</span> คน):</label>
+          <div>
+            <button class="btn-action" onclick="selectAllUsers(true)">เลือกผู้ใช้ทั้งหมด</button>
+            <button class="btn-action" onclick="selectAllUsers(false)">ยกเลิกทั้งหมด</button>
+          </div>
+        </div>
+        <div id="user-checkbox-container" class="checkbox-list">
+          <p style="text-align: center; color: var(--sub-text); padding: 10px;">⏳ กำลังโหลดรายชื่อผู้ใช้...</p>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <label style="font-size: 13px; font-weight: 600;">เลือกไฟล์ที่สิทธิ์อ่านได้ (<span id="file-count">0</span>):</label>
+        <!-- ส่วนเลือกไฟล์ PDF -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; margin-top: 15px;">
+          <label style="font-size: 14px; font-weight: 600;">2) ติ๊กเลือกวิชา/ไฟล์ที่ต้องการอนุญาต (<span id="file-count">0</span> ไฟล์):</label>
           <div>
-            <button class="btn-action" onclick="selectAllFiles(true)">เลือกทั้งหมด</button>
+            <button class="btn-action" onclick="selectAllFiles(true)">เลือกไฟล์ทั้งหมด</button>
             <button class="btn-action" onclick="selectAllFiles(false)">ยกเลิกทั้งหมด</button>
           </div>
         </div>
-
-        <div id="file-checkbox-container" class="file-checkbox-list">
-          <p style="text-align: center; color: var(--sub-text); padding: 15px;">⏳ กำลังโหลดรายการไฟล์ทั้งหมด...</p>
+        <div id="file-checkbox-container" class="checkbox-list">
+          <p style="text-align: center; color: var(--sub-text); padding: 10px;">⏳ กำลังโหลดรายการไฟล์...</p>
         </div>
 
-        <button class="btn" onclick="savePermissions()">💾 บันทึกสิทธิ์การเข้าถึงไฟล์</button>
+        <button class="btn" onclick="saveBulkPermissions()">💾 บันทึกสิทธิ์กลุ่ม (Bulk Save)</button>
         <div id="save-status" class="status-msg"></div>
       </div>
 
@@ -372,7 +372,7 @@
             <thead>
               <tr>
                 <th>Username</th>
-                <th>Access Code (รหัสผ่าน)</th>
+                <th>Access Code</th>
                 <th>การจัดการ</th>
               </tr>
             </thead>
@@ -395,12 +395,11 @@
     const ADMIN_PIN = "2537";
 
     let allFiles = [];
-    let selectedUser = "";
+    let allUsers = [];
 
     function initTheme() {
       const savedTheme = localStorage.getItem("admin_theme");
       const themeBtn = document.getElementById("theme-btn");
-
       if (savedTheme === "dark") {
         document.body.classList.add("dark-mode");
         themeBtn.innerText = "☀️ โหมดสว่าง";
@@ -413,28 +412,20 @@
     function toggleTheme() {
       const isDark = document.body.classList.toggle("dark-mode");
       const themeBtn = document.getElementById("theme-btn");
-
-      if (isDark) {
-        localStorage.setItem("admin_theme", "dark");
-        themeBtn.innerText = "☀️ โหมดสว่าง";
-      } else {
-        localStorage.setItem("admin_theme", "light");
-        themeBtn.innerText = "🌙 โหมดมืด";
-      }
+      localStorage.setItem("admin_theme", isDark ? "dark" : "light");
+      themeBtn.innerText = isDark ? "☀️ โหมดสว่าง" : "🌙 โหมดมืด";
     }
 
     initTheme();
 
     function unlockAdmin() {
       const inputPin = document.getElementById("admin-pin").value;
-      const errorMsg = document.getElementById("pin-error");
-
       if (inputPin === ADMIN_PIN) {
         document.getElementById("pin-box").style.display = "none";
         document.getElementById("admin-content").style.display = "block";
         initAdminPanel();
       } else {
-        errorMsg.style.display = "block";
+        document.getElementById("pin-error").style.display = "block";
       }
     }
 
@@ -443,7 +434,6 @@
       await fetchAllFiles();
     }
 
-    // --- อัปโหลด PDF ---
     async function uploadPdfFile() {
       const fileInput = document.getElementById("pdf-upload-input");
       const statusBox = document.getElementById("upload-status");
@@ -457,13 +447,6 @@
       }
 
       const file = fileInput.files[0];
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        statusBox.className = "status-msg status-error";
-        statusBox.innerText = "❌ อัปโหลดได้เฉพาะไฟล์นามสกุล .pdf เท่านั้นน้า!";
-        statusBox.style.display = "block";
-        return;
-      }
-
       statusBox.className = "status-msg";
       statusBox.style.background = "#fff3cd";
       statusBox.style.color = "#856404";
@@ -471,16 +454,11 @@
       statusBox.style.display = "block";
 
       try {
-        const { data, error } = await _supabase.storage
-          .from('pdf-files')
-          .upload(file.name, file, { upsert: true });
-
+        const { error } = await _supabase.storage.from('pdf-files').upload(file.name, file, { upsert: true });
         if (error) throw error;
-
         statusBox.className = "status-msg status-success";
         statusBox.innerText = `✅ อัปโหลดไฟล์ "${file.name}" สำเร็จเรียบร้อยแล้ว!`;
         fileInput.value = "";
-
         await fetchAllFiles();
       } catch (err) {
         statusBox.className = "status-msg status-error";
@@ -488,7 +466,6 @@
       }
     }
 
-    // --- ระบบสแกนสลิปโอนเงิน ---
     async function handleSlipUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -499,9 +476,7 @@
       statusBox.style.color = "#856404";
       statusBox.innerText = "⏳ กำลังสแกนสลิปเพื่อค้นหาข้อมูล...";
 
-      let foundPasscode = "";
-      let foundUsername = "";
-
+      let foundPasscode = "", foundUsername = "";
       const img = new Image();
       img.src = URL.createObjectURL(file);
 
@@ -509,73 +484,30 @@
         try {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
-          canvas.width = img.width;
-          canvas.height = img.height;
+          canvas.width = img.width; canvas.height = img.height;
           ctx.drawImage(img, 0, 0, img.width, img.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
           const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-          if (qrCode && qrCode.data) {
+          if (qrCode?.data) {
             const cleanQr = qrCode.data.trim();
-            if (cleanQr.length >= 4) {
-              foundPasscode = cleanQr.slice(-4);
-            }
+            if (cleanQr.length >= 4) foundPasscode = cleanQr.slice(-4);
           }
-        } catch (e) {
-          console.log("QR Code error:", e);
-        }
+        } catch (e) {}
 
         try {
           const worker = await Tesseract.createWorker('tha+eng');
           const ret = await worker.recognize(file);
           await worker.terminate();
-
           const rawText = ret.data.text;
-          let senderText = rawText;
-          const toIndex = rawText.search(/(ไปยัง|โอนไปยัง|To\b|ผู้รับเงิน|เข้าบัญชี)/i);
-          if (toIndex !== -1) {
-            senderText = rawText.substring(0, toIndex);
-          }
-
-          const nameWithPrefix = senderText.match(/(?:นาย|นางสาว|นาง|คุณ|Mr\.|Mrs\.|Ms\.)\s*([ก-๙A-Za-z]+)/i);
-          if (nameWithPrefix && nameWithPrefix[1]) {
-            foundUsername = nameWithPrefix[1].trim();
-          } else {
-            const fromMatch = senderText.match(/(?:จาก|From)\s*[:\s]*([ก-๙A-Za-z]+)/i);
-            if (fromMatch && fromMatch[1]) {
-              const tempName = fromMatch[1].trim();
-              const ignoreList = ["โอนเงิน", "สำเร็จ", "ธนาคาร", "บัญชี", "กสิกร", "ไทยพาณิชย์", "กรุงไทย", "กรุงเทพ", "ออมสิน"];
-              if (!ignoreList.includes(tempName)) {
-                foundUsername = tempName;
-              }
-            }
-          }
-
-          if (!foundUsername) {
-            const cleanText = senderText.replace(/(โอนเงิน|สำเร็จ|รายการ|สลิป|ธนาคาร|กสิกร|ไทยพาณิชย์|กรุงไทย|กรุงเทพ|ออมสิน|กรุงศรี|TTB|CIMB|UOB|จาก|From|บัญชี|จำนวน)/g, ' ');
-            const words = cleanText.match(/[ก-๙]{2,}/g);
-            if (words && words.length > 0) {
-              foundUsername = words[0].trim();
-            }
-          }
-
-          if (!foundPasscode) {
-            const txMatch = rawText.match(/(?:เลขที่ทำรายการ|เลขที่รายการ|รหัสอ้างอิง|เลขที่อ้างอิง|Ref\.?\s*No\.?|Txn\s*ID)[\s:-]*([A-Za-z0-9ก-๙\-_]+)/i);
-            if (txMatch && txMatch[1]) {
-              const txStr = txMatch[1].trim();
-              foundPasscode = txStr.length >= 4 ? txStr.slice(-4) : txStr;
-            }
-          }
-
-        } catch (err) {
-          console.log("OCR Error:", err);
-        }
+          const nameMatch = rawText.match(/(?:นาย|นางสาว|นาง|คุณ|Mr\.|Mrs\.|Ms\.)\s*([ก-๙A-Za-z]+)/i);
+          if (nameMatch && nameMatch[1]) foundUsername = nameMatch[1].trim();
+        } catch (err) {}
 
         if (foundUsername) document.getElementById("new-username").value = foundUsername;
         if (foundPasscode) document.getElementById("new-passcode").value = foundPasscode;
 
         statusBox.className = "status-msg status-success";
-        statusBox.innerText = `✅ สแกนเสร็จสิ้น! (ชื่อผู้โอน: ${foundUsername || 'ไม่พบ'}, 4 ตัวท้าย: ${foundPasscode || 'ไม่พบ'}) ตรวจเช็กก่อนกดบันทึกน้า`;
+        statusBox.innerText = `✅ สแกนเสร็จสิ้น! (ผู้โอน: ${foundUsername || 'ไม่พบ'}, 4 ตัวท้าย: ${foundPasscode || 'ไม่พบ'})`;
       };
     }
 
@@ -591,15 +523,7 @@
         return;
       }
 
-      statusBox.className = "status-msg";
-      statusBox.style.background = "#fff3cd";
-      statusBox.style.color = "#856404";
-      statusBox.innerText = "⏳ กำลังบันทึกข้อมูล...";
-      statusBox.style.display = "block";
-
-      const { error } = await _supabase
-        .from('user_access_codes')
-        .insert([{ username: usernameInput, access_code: passcodeInput }]);
+      const { error } = await _supabase.from('user_access_codes').insert([{ username: usernameInput, access_code: passcodeInput }]);
 
       if (error) {
         statusBox.className = "status-msg status-error";
@@ -607,55 +531,48 @@
       } else {
         statusBox.className = "status-msg status-success";
         statusBox.innerText = `✅ เพิ่มลูกค้า "${usernameInput}" สำเร็จแล้ว!`;
-        
         document.getElementById("new-username").value = "";
         document.getElementById("new-passcode").value = "";
-        document.getElementById("ocr-status").style.display = "none";
-
         await fetchUsersList();
-        document.getElementById("user-select").value = usernameInput;
-        onUserSelected();
       }
+      statusBox.style.display = "block";
     }
 
     async function fetchUsersList() {
-      const userSelect = document.getElementById("user-select");
       const tableBody = document.getElementById("user-table-body");
-      
-      const { data: users, error } = await _supabase
-        .from('user_access_codes')
-        .select('*')
-        .order('username', { ascending: true });
+      const userContainer = document.getElementById("user-checkbox-container");
+
+      const { data: users, error } = await _supabase.from('user_access_codes').select('*').order('username', { ascending: true });
 
       if (error || !users || users.length === 0) {
-        userSelect.innerHTML = `<option value="">-- ไม่พบรายชื่อลูกค้า --</option>`;
         tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">ยังไม่มีข้อมูลลูกค้า</td></tr>`;
+        userContainer.innerHTML = `<p style="text-align:center;">ไม่มีรายชื่อผู้ใช้</p>`;
         return;
       }
 
-      userSelect.innerHTML = `<option value="">-- เลือกชื่อผู้ใช้จากระบบ --</option>` + 
-        users.map(u => `<option value="${u.username}">${u.username}</option>`).join('');
+      allUsers = users;
+      document.getElementById("user-count").innerText = users.length;
+
+      userContainer.innerHTML = users.map(u => `
+        <label class="checkbox-item">
+          <input type="checkbox" value="${u.username}" class="user-chk">
+          <span>👤 <b>${u.username}</b> (รหัส: ${u.access_code})</span>
+        </label>
+      `).join('');
 
       tableBody.innerHTML = users.map(u => `
         <tr>
           <td><b>${u.username}</b></td>
           <td><code>${u.access_code}</code></td>
           <td>
-            <button class="btn-action btn-action-primary" onclick="selectUserFromTable('${u.username}')">จัดการสิทธิ์</button>
+            <button class="btn-action btn-action-primary" onclick="quickSelectUser('${u.username}')">เลือกชื่อนี้</button>
           </td>
         </tr>
       `).join('');
     }
 
-    function selectUserFromTable(username) {
-      document.getElementById("user-select").value = username;
-      onUserSelected();
-      window.scrollTo({ top: 400, behavior: 'smooth' });
-    }
-
     async function fetchAllFiles() {
       const container = document.getElementById("file-checkbox-container");
-      
       const { data: files, error } = await _supabase.storage.from('pdf-files').list();
 
       if (error || !files || files.length === 0) {
@@ -666,98 +583,63 @@
       allFiles = files.filter(f => !f.name.startsWith('.') && f.name.endsWith('.pdf'));
       document.getElementById("file-count").innerText = allFiles.length;
 
-      renderFileCheckboxes([]);
+      container.innerHTML = allFiles.map(f => `
+        <label class="checkbox-item">
+          <input type="checkbox" value="${f.name}" class="file-chk">
+          <span>📄 ${f.name}</span>
+        </label>
+      `).join('');
     }
 
-    function renderFileCheckboxes(allowedFiles) {
-      const container = document.getElementById("file-checkbox-container");
-      
-      if (allFiles.length === 0) {
-        container.innerHTML = `<p style="text-align:center;">ไม่มีไฟล์</p>`;
-        return;
-      }
-
-      container.innerHTML = allFiles.map(file => {
-        const isChecked = allowedFiles.includes(file.name) ? 'checked' : '';
-        return `
-          <label class="checkbox-item">
-            <input type="checkbox" value="${file.name}" class="file-chk" ${isChecked}>
-            <span>📄 ${file.name}</span>
-          </label>
-        `;
-      }).join('');
-    }
-
-    async function onUserSelected() {
-      selectedUser = document.getElementById("user-select").value;
-      if (selectedUser) {
-        await loadUserPermissions(selectedUser);
-      } else {
-        renderFileCheckboxes([]);
-      }
-    }
-
-    async function loadUserPermissions(username) {
-      const { data: userPerms, error } = await _supabase
-        .from('user_permissions')
-        .select('file_name')
-        .ilike('username', username);
-
-      if (error || !userPerms) {
-        renderFileCheckboxes([]);
-        return;
-      }
-
-      const allowedFiles = userPerms.map(p => p.file_name);
-      renderFileCheckboxes(allowedFiles);
+    function selectAllUsers(shouldSelect) {
+      document.querySelectorAll('.user-chk').forEach(c => c.checked = shouldSelect);
     }
 
     function selectAllFiles(shouldSelect) {
-      const checkboxes = document.querySelectorAll('.file-chk');
-      checkboxes.forEach(chk => chk.checked = shouldSelect);
+      document.querySelectorAll('.file-chk').forEach(c => c.checked = shouldSelect);
     }
 
-    async function savePermissions() {
+    function quickSelectUser(username) {
+      selectAllUsers(false);
+      const target = Array.from(document.querySelectorAll('.user-chk')).find(c => c.value === username);
+      if (target) target.checked = true;
+      window.scrollTo({ top: 500, behavior: 'smooth' });
+    }
+
+    async function saveBulkPermissions() {
       const statusBox = document.getElementById("save-status");
       statusBox.style.display = "none";
 
-      if (!selectedUser) {
+      const selectedUsers = Array.from(document.querySelectorAll('.user-chk:checked')).map(c => c.value);
+      const selectedFiles = Array.from(document.querySelectorAll('.file-chk:checked')).map(c => c.value);
+
+      if (selectedUsers.length === 0) {
         statusBox.className = "status-msg status-error";
-        statusBox.innerText = "❌ กรุณาเลือกชื่อผู้ใช้ก่อนบันทึกน้า!";
+        statusBox.innerText = "❌ กรุณาติ๊กเลือกผู้ใช้อย่างน้อย 1 คนน้า!";
         statusBox.style.display = "block";
         return;
       }
 
-      const checkedBoxes = document.querySelectorAll('.file-chk:checked');
-      const selectedFiles = Array.from(checkedBoxes).map(chk => chk.value);
-
       statusBox.className = "status-msg";
-      statusBox.style.background = "#856404";
-      statusBox.style.color = "#fff3cd";
-      statusBox.innerText = "⏳ กำลังบันทึกข้อมูลสิทธิ์...";
+      statusBox.style.background = "#fff3cd";
+      statusBox.style.color = "#856404";
+      statusBox.innerText = `⏳ กำลังอัปเดตสิทธิ์ให้ผู้ใช้ ${selectedUsers.length} คน...`;
       statusBox.style.display = "block";
 
       try {
-        await _supabase
-          .from('user_permissions')
-          .delete()
-          .ilike('username', selectedUser);
-
-        if (selectedFiles.length > 0) {
-          const insertData = selectedFiles.map(fileName => ({
-            username: selectedUser,
-            file_name: fileName
-          }));
-
-          const { error: insertError } = await _supabase
-            .from('user_permissions')
-            .insert(insertData);
-
-          if (insertError) throw insertError;
+        for (const user of selectedUsers) {
+          // ลบสิทธิ์เดิมออกก่อน
+          await _supabase.from('user_permissions').delete().ilike('username', user);
+          
+          // ใส่สิทธิ์ใหม่เข้าไป
+          if (selectedFiles.length > 0) {
+            const insertData = selectedFiles.map(f => ({ username: user, file_name: f }));
+            await _supabase.from('user_permissions').insert(insertData);
+          }
         }
 
         statusBox.className = "status-msg status-success";
-        statusBox.innerText = `✅ บันทึกสิทธิ์ให้ "${selectedUser}" เรียบร้อยแล้ว! (${selectedFiles.length} ไฟล์)`;
+        statusBox.innerText = `✅ บันทึกสิทธิ์สำเร็จ! มอบสิทธิ์ ${selectedFiles.length} ไฟล์ ให้ลูกค้า ${selectedUsers.length} คนเรียบร้อยแล้วค่ะ🎉`;
       } catch (err) {
         statusBox.className = "status-msg status-error";
         statusBox.innerText = "❌ เกิดข้อผิดพลาดในการบันทึก: " + err.message;
