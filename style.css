@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
+
 /* ธีมปกติ (Light Mode) */
 :root {
   --bg-color: #FDFBF7;
@@ -44,7 +46,7 @@ input, select {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Prompt', 'Itim', sans-serif;
+  font-family: 'Itim', cursive !important;
 }
 
 body {
@@ -82,7 +84,7 @@ body {
   align-items: center;
   gap: 8px;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   color: #E2A99B;
 }
 
@@ -98,7 +100,7 @@ body {
   font-size: 13px;
   padding: 6px 12px;
   border-radius: 20px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .badge-online {
@@ -175,7 +177,7 @@ body {
 
 h2 {
   color: #8E756C;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 22px;
   margin-bottom: 6px;
   word-break: break-word;
@@ -203,7 +205,7 @@ h2 {
   font-size: 14px;
   color: #6C5A55;
   margin-bottom: 6px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .form-group input {
@@ -230,7 +232,7 @@ h2 {
   border: none;
   border-radius: 12px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 4px 12px rgba(226, 169, 155, 0.3);
@@ -296,7 +298,7 @@ h2 {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden; /* ป้องกันเนื้อหาทะลุ */
+  overflow: hidden;
 }
 
 .file-card:hover {
@@ -310,14 +312,13 @@ h2 {
   margin-bottom: 10px;
 }
 
-/* แก้ไขจุดตัวอักษรทะลุกรอบ */
 .file-card h3 {
   font-size: 15px;
   color: #4A3E3D;
   margin-bottom: 6px;
   white-space: normal;
   word-break: break-word;
-  overflow-wrap: anywhere; /* บังคับตัดบรรทัดเมื่อคำยาวเกิน */
+  overflow-wrap: anywhere;
   line-height: 1.4;
 }
 
@@ -333,7 +334,7 @@ h2 {
   display: inline-block;
   font-size: 13px;
   color: #E2A99B;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .coming-soon-card {
@@ -367,7 +368,7 @@ h2 {
   border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   transition: background 0.2s;
 }
 
