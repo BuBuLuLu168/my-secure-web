@@ -1,5 +1,5 @@
 // ==========================================
-// My KeySpace - Main Script (With Anti-Sharing & Exit Log)
+// My KeySpace - Main Script (Complete Version)
 // ==========================================
 
 const SUPABASE_URL = "https://uosbgylfvenkpesxxrct.supabase.co";
@@ -42,10 +42,25 @@ async function logUserActivity(username, action, details = "") {
   }
 }
 
-// 🚪 บันทึก Log เมื่อผู้ใช้ออก/ปิดหน้าเว็บ หรือสลับแอป
+// 🚪 บันทึก Log เมื่อผู้ใช้ออก/ปิดหน้าเว็บ (แก้ไขใช้ fetch + keepalive ยิงสำเร็จแน่นอนแม้ออกจากเว็บ)
 window.addEventListener("pagehide", () => {
   if (currentLoggedInUser) {
-    logUserActivity(currentLoggedInUser, 'EXIT_PAGE', 'ปิดหน้าเว็บหรือสลับหน้าจอออก');
+    const payload = JSON.stringify({
+      username: currentLoggedInUser,
+      action: 'EXIT_PAGE',
+      details: 'ปิดหน้าเว็บหรือสลับหน้าจอออก'
+    });
+
+    fetch(`${SUPABASE_URL}/rest/v1/user_logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      },
+      body: payload,
+      keepalive: true
+    }).catch(() => {});
   }
 });
 
@@ -135,7 +150,7 @@ async function checkAccess() {
   await _supabase
     .from('user_access_codes')
     .update({ last_device_token: myDeviceToken })
-    .eq('username', currentLoggedInUser);
+    .ilike('username', currentLoggedInUser);
 
   errorMsg.style.display = "none";
   document.getElementById("login-box").style.display = "none";
@@ -262,7 +277,7 @@ function filterFiles() {
 }
 
 // ------------------------------------------
-// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล + บันทึก Log
+// 4. แสดงผล PDF + ฝังลายน้ำดิจิทัล (ปรับสบายตา ไม่ลายตา) + บันทึก Log
 // ------------------------------------------
 async function openPdfViewer(fileName, fileUrl) {
   document.getElementById("dashboard-box").style.display = "none";
@@ -311,14 +326,15 @@ async function openPdfViewer(fileName, fileUrl) {
       
       await page.render(renderContext).promise;
 
+      // 🎨 ปรับลายน้ำ: ขยายระยะห่างเป็น 450px/600px และความเข้มเหลือ 10% (อ่านง่าย สบายตา)
       const watermarkText = `${currentLoggedInUser} - ${new Date().toLocaleDateString('th-TH')}`;
       context.save();
-      context.font = "bold 32px 'Itim', sans-serif";
-      context.fillStyle = "rgba(226, 169, 155, 0.22)";
-      context.rotate(-25 * Math.PI / 180);
+      context.font = "bold 28px 'Itim', sans-serif";
+      context.fillStyle = "rgba(200, 134, 117, 0.10)";
+      context.rotate(-20 * Math.PI / 180);
 
-      for (let y = -canvas.height; y < canvas.height * 2; y += 180) {
-        for (let x = -canvas.width; x < canvas.width * 2; x += 320) {
+      for (let y = -canvas.height; y < canvas.height * 2; y += 450) {
+        for (let x = -canvas.width; x < canvas.width * 2; x += 600) {
           context.fillText(watermarkText, x, y);
         }
       }
